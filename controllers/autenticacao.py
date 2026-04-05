@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from services.usuario_service import authenticar_usuario
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -6,3 +7,10 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 @router.get("/status")
 async def auth_status():
     return {"status": "auth route"}
+
+@router.post("/login")
+async def login(email: str, senha: str):
+    usuario = authenticar_usuario(email, senha)
+    if usuario:
+        return {"message": "Login successful", "user": usuario.nome}
+    return {"message": "Invalid credentials"}

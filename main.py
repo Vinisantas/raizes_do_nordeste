@@ -1,7 +1,9 @@
 import time
 from fastapi import FastAPI
 from controllers.autenticacao import router as auth_router
+from controllers.usuario_controller import router as usuarios_router
 from database.usuario import Base_model, engine
+
 
 
 app = FastAPI(
@@ -11,6 +13,8 @@ app = FastAPI(
 )
 
 app.include_router(auth_router)
+app.include_router(usuarios_router) 
+
 
 
 @app.get("/")

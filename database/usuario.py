@@ -1,15 +1,12 @@
-from datetime import datetime
-from sqlalchemy import Column, DateTime, String, Integer, Enum
-from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy import create_engine
-import os
+from sqlalchemy import Column, String, Integer, Enum
+from database.conexao import Base
 
-class Base_model(DeclarativeBase):
-    pass
+class role_usuario(Enum):
+    ADMIN = 'ADMIN'
+    CLIENTE = 'CLIENTE'
+    GERENTE = 'GERENTE'
 
-engine = create_engine('postgresql://admin:admin@postgres:5432/raizes_do_nordeste')
-
-class Usuario(Base_model):
+class Usuario(Base):
 
     __tablename__ = 'usuarios'
 
@@ -17,7 +14,9 @@ class Usuario(Base_model):
     nome = Column(String(255), nullable=False)
     email = Column(String(255), nullable=False, unique=True)
     senha = Column(String(255), nullable=False)
-    role = Column(Enum('ADMIN', 'CLIENTE', 'GERENTE', name='user_roles'), nullable=False)
+    role = Column(Enum(role_usuario), nullable=False)
+    usuario_id = Column(Integer, nullable=False, default=0)
 
+    
     def __repr__(self):
-        return f"<Usuario(id={self.id}, nome='{self.nome}', email='{self.email}', role='{self.role}')>"
+        return f"<Usuario(id={self.id}, nome='{self.nome}', email='{self.email}', role='{self.role}', usuario_id='{self.usuario_id}')>"
