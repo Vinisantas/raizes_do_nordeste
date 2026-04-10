@@ -1,4 +1,5 @@
 from sqlalchemy import Column, String, Integer
+from sqlalchemy.orm import relationship
 from database.conexao import Base
 
 
@@ -10,6 +11,9 @@ class Unidade(Base):
     nome = Column(String(255), nullable=False)
     endereco = Column(String(255), nullable=False)
     unidade_id = Column(Integer, nullable=False , default=0, unique=True)
+    produtos = relationship("Produto", back_populates="unidade")
+    estoque = relationship("Estoque", back_populates="unidade")
+    pedidos = relationship("Pedido", back_populates="unidade")
 
 
     def __repr__(self):

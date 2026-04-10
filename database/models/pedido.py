@@ -33,8 +33,8 @@ class Pedido(Base):
     usuario = relationship("Usuario", back_populates="pedidos")
     unidade = relationship("Unidade", back_populates="pedidos")
     itens = relationship("ItemPedido", back_populates="pedido", cascade="all, delete-orphan")
+    pagamento = relationship("Pagamento", back_populates="pedido", uselist=False, cascade="all, delete-orphan")
 
-    
 
     def __repr__(self):
         return f"<Pedido(id={self.id}, usuario_id='{self.usuario_id}', unidade_id='{self.unidade_id}', data_pedido='{self.data_pedido}', total='{self.total}', status='{self.status}', canal_pedido='{self.canal_pedido}')>"
@@ -47,10 +47,10 @@ class ItemPedido(Base):
     pedido_id = Column(Integer, ForeignKey('pedidos.id'), nullable=False)
     produto_id = Column(Integer, ForeignKey('produtos.id'), nullable=False)
     quantidade = Column(Integer, nullable=False)
-    preco_unitario = Column(Numeric(10, 2), nullable=False)
-    subtotal = Column(Numeric(10, 2), nullable=False)
+    preco_unitario = Column(Numeric(10, 2), ForeignKey('produtos.preco'), nullable=False)
     pedido = relationship("Pedido", back_populates="itens")
+    produto = relationship("Produto")
     
 
     def __repr__(self):
-        return f"<ItemPedido(id={self.id}, pedido_id='{self.pedido_id}', produto_id='{self.produto_id}', quantidade='{self.quantidade}', preco_unitario='{self.preco_unitario}', subtotal='{self.subtotal}')>"
+        return f"<ItemPedido(id={self.id}, pedido_id='{self.pedido_id}', produto_id='{self.produto_id}', quantidade='{self.quantidade}', preco_unitario='{self.preco_unitario}')>"

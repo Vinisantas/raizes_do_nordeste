@@ -13,9 +13,10 @@ class Produto(Base):
     preco = Column(Numeric(10, 2), nullable=False)
     unidade_id = Column(Integer, ForeignKey('unidades.id'), nullable=False)
     unidade = relationship("Unidade", back_populates="produtos")
-    
+    estoque = relationship("Estoque", back_populates="produto")
+    items_pedido = relationship("ItemPedido", back_populates="produto")
+
 
     def __repr__(self):
         return f"<Produto(id={self.id}, nome='{self.nome}', descricao='{self.descricao}', preco='{self.preco}', unidade_id='{self.unidade_id}')>"
-    
 
