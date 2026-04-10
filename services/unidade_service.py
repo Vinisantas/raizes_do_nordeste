@@ -1,4 +1,4 @@
-from database.unidade import Unidade
+from database.models.unidade import Unidade
 
 
 def criar_unidade_service(db, unidade):

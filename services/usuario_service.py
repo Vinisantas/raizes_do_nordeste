@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from database.usuario import Usuario
+from database.models.usuario import Usuario
 from schemas.usuario_schema import UsuarioCreate
 
 def criar_usuario_service(db: Session, usuario: UsuarioCreate):
