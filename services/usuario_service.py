@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from database.usuario import Usuario
 from schemas.usuario_schema import UsuarioCreate
 
-def criar_usuario(db: Session, usuario: UsuarioCreate):
+def criar_usuario_service(db: Session, usuario: UsuarioCreate):
     db_usuario = Usuario(
         nome=usuario.nome,
         email=usuario.email,
@@ -16,14 +16,14 @@ def criar_usuario(db: Session, usuario: UsuarioCreate):
     return db_usuario
 
 
-def listar_usuarios(db: Session):
+def listar_usuarios_service(db: Session):
     return db.query(Usuario).all()
 
-def listar_usuario_por_id(db: Session, usuario_id: int):
+def listar_usuario_por_id_service(db: Session, usuario_id: int):
     return db.query(Usuario).filter(Usuario.id == usuario_id).first()
 
 
-def deletar_usuario(db: Session, usuario_id: int):
+def deletar_usuario_service(db: Session, usuario_id: int):
     db_usuario = db.query(Usuario).filter(Usuario.id == usuario_id).first()
     if db_usuario:
         db.delete(db_usuario)
@@ -32,7 +32,7 @@ def deletar_usuario(db: Session, usuario_id: int):
     return False
 
 
-def atualizar_usuario(db: Session, usuario_id: int, usuario: UsuarioCreate):
+def atualizar_usuario_service(db: Session, usuario_id: int, usuario: UsuarioCreate):
     db_usuario = db.query(Usuario).filter(Usuario.id == usuario_id).first()
     if db_usuario:
         db_usuario.nome = usuario.nome
@@ -45,5 +45,5 @@ def atualizar_usuario(db: Session, usuario_id: int, usuario: UsuarioCreate):
     return None
 
 
-def authenticar_usuario(db: Session, email: str, senha: str):
+def authenticar_usuario_service(db: Session, email: str, senha: str):
     return db.query(Usuario).filter(Usuario.email == email, Usuario.senha == senha).first()
