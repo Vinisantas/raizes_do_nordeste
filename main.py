@@ -11,7 +11,7 @@ app = FastAPI(
 )
 
 app.include_router(auth_router)
-app.include_router(usuarios_router) 
+app.include_router(usuarios_router)
 
 
 @app.get("/")
