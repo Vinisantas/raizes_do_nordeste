@@ -2,9 +2,11 @@ from datetime import datetime
 from sqlalchemy import Column, Enum, Integer, DateTime,ForeignKey, Numeric
 from database.conexao import Base
 from sqlalchemy.orm import relationship
+from enum import Enum as PyEnum
 
 
-class enum(str, Enum):
+
+class enum(PyEnum):
     CARTAO_CREDITO = 'CARTAO_CREDITO'
     CARTAO_DEBITO = 'CARTAO_DEBITO'
     PIX = 'PIX'

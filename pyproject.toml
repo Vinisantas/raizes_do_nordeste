@@ -1,11 +1,12 @@
 [project]
 name = "raizes-do-nordeste"
 version = "0.1.0"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 dependencies = [
-    "fastapi>=0.135.2",
-    "uvicorn>=0.42.0",
+    "fastapi",
+    "uvicorn[standard]",
     "sqlalchemy>=2.0.48",
     "psycopg2-binary>=2.9.0",
     "pydantic>=2.0.0",
+    "pydantic[email]"
 ]

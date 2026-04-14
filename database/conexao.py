@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
+from database.models import *
 
 
 
@@ -21,5 +22,4 @@ def get_db():
         db.close()
 
 def init_db():
-    import database.models
     Base.metadata.create_all(bind=engine)

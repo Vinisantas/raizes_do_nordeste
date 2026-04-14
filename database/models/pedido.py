@@ -44,10 +44,10 @@ class ItemPedido(Base):
     __tablename__ = 'itens_pedido'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    pedido_id = Column(Integer, ForeignKey('pedidos.id'), nullable=False)
-    produto_id = Column(Integer, ForeignKey('produtos.id'), nullable=False)
+    pedido_id = Column(Integer, ForeignKey("pedidos.id"), nullable=False)
+    produto_id = Column(Integer, ForeignKey("produtos.id"), nullable=False)
     quantidade = Column(Integer, nullable=False)
-    preco_unitario = Column(Numeric(10, 2), ForeignKey('produtos.preco'), nullable=False)
+    preco_unitario = Column(Numeric(10, 2), nullable=False)
     pedido = relationship("Pedido", back_populates="itens")
     produto = relationship("Produto")
     
