@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-
 from controllers.autenticacao import router as auth_router
 from controllers.usuario_controller import router as usuarios_router
+from controllers.unidade_controller import router as unidades_router
+from controllers.produto_controller import router as produtos_router
 from database.conexao import init_db
 
 
@@ -29,6 +30,8 @@ app = FastAPI(
 # Rotas
 app.include_router(auth_router)
 app.include_router(usuarios_router)
+app.include_router(unidades_router)
+app.include_router(produtos_router)
 
 
 @app.get("/")

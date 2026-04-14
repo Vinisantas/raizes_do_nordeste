@@ -8,3 +8,14 @@ class ProdutoBase(BaseModel):
     preco: Decimal
     unidade_id: int
 
+class ProdutoCreate(ProdutoBase):
+    pass
+
+class ProdutoUpdate(ProdutoBase):
+    pass
+
+class ProdutoResponse(ProdutoBase):
+    id: int
+
+    class Config:
+        orm_mode = True
