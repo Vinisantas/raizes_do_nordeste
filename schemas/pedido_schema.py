@@ -15,3 +15,14 @@ class ItemPedidoBase(BaseModel):
     quantidade: int
     preco_unitario: Decimal
     subtotal: float
+
+class PedidoCreate(BaseModel):
+    pass
+
+class PedidoUpdate(BaseModel):
+    pass
+
+class PedidoResponse(BaseModel):
+    id: int
+    class Config:
+        orm_mode = True

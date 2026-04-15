@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database.conexao import get_db
 from schemas.produto_schema import ProdutoCreate, ProdutoUpdate, ProdutoResponse
@@ -9,6 +9,7 @@ from services.produto_service import (
     atualizar_produto_service,
     deletar_produto_service
 )
+
 
 router = APIRouter(prefix="/produtos", tags=["Produtos"])
 
@@ -28,11 +29,13 @@ def listar_produto(produto_id: int, db: Session = Depends(get_db)):
     return listar_produto_por_id_service(db, produto_id)
 
 
-@router.patch("/{produto_id}", response_model=ProdutoResponse)
-def atualizar_produto(produto_id: int, produto: ProdutoUpdate, db: Session = Depends(get_db)):
-    return atualizar_produto_service(db, produto_id, produto)
-
-
 @router.delete("/{produto_id}", status_code=204)
 def deletar_produto(produto_id: int, db: Session = Depends(get_db)):
-    deletar_produto_service(db, produto_id)
+    deletado = deletar_produto_service(db, produto_id)
+    if not deletado:
+        raise HTTPException(status_code=404, detail="Produto não encontrado")
+
+
+@router.patch("/{produto_id}")
+def atualizar_produto(produto_id: int, produto: ProdutoUpdate, db: Session = Depends(get_db)):
+    return atualizar_produto_service(db, produto_id, produto)

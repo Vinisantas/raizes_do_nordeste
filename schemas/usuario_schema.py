@@ -15,3 +15,9 @@ class UsuarioCreate(UsuarioBase):
 
 class UsuarioRead(UsuarioBase):
     id: int
+
+class UsuarioResponse(UsuarioRead):
+    id: int
+
+    class Config:
+        orm_mode = True
