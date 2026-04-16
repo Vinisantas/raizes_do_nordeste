@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from database.conexao import get_db
-from schemas.usuario_schema import UsuarioCreate, UsuarioResponse
+from schemas.usuario_schema import UsuarioCreate, UsuarioResponse, UsuarioUpdate
 from services.usuario_service import (
     atualizar_usuario_service,
     criar_usuario_service,
@@ -35,5 +35,5 @@ def deletar_usuario(id: int, db: Session = Depends(get_db)):
 
 
 @router.patch("/{id}", response_model=UsuarioResponse)
-def atualizar_usuario(id: int, usuario: UsuarioCreate, db: Session = Depends(get_db)):
+def atualizar_usuario(id: int, usuario: UsuarioUpdate, db: Session = Depends(get_db)):
     return atualizar_usuario_service(db, id, usuario)

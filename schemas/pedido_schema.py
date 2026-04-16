@@ -1,28 +1,25 @@
 from decimal import Decimal
 from pydantic import BaseModel
+from database.models.pedido import StatusPedido, CanalPedido
 
-class PedidoBase(BaseModel):
-    usuario_id: int
-    unidade_id: int
-    data_pedido: str
-    total: Decimal
-    status = enumerate
-    canal_pedido: enumerate
-    
-class ItemPedidoBase(BaseModel):
-    pedido_id: int
+
+class ItemPedidoCreate(BaseModel):
     produto_id: int
     quantidade: int
-    preco_unitario: Decimal
-    subtotal: float
+
 
 class PedidoCreate(BaseModel):
-    pass
+    usuario_id: int
+    unidade_id: int
+    status: StatusPedido
+    canal_pedido: CanalPedido
+    itens: list[ItemPedidoCreate]
 
-class PedidoUpdate(BaseModel):
-    pass
 
 class PedidoResponse(BaseModel):
     id: int
+    total: Decimal
+    status: StatusPedido
+
     class Config:
-        orm_mode = True
+        from_attributes = True

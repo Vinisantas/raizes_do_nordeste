@@ -24,18 +24,21 @@ def listar_produtos(db: Session = Depends(get_db)):
     return listar_produtos_service(db)
 
 
-@router.get("/{produto_id}", response_model=ProdutoResponse)
-def listar_produto(produto_id: int, db: Session = Depends(get_db)):
-    return listar_produto_por_id_service(db, produto_id)
+@router.get("/{id}", response_model=ProdutoResponse)
+def listar_produto(id: int, db: Session = Depends(get_db)):
+    return listar_produto_por_id_service(db, id)
 
 
-@router.delete("/{produto_id}", status_code=204)
-def deletar_produto(produto_id: int, db: Session = Depends(get_db)):
-    deletado = deletar_produto_service(db, produto_id)
+@router.delete("/{id}", status_code=204)
+def deletar_produto(id: int, db: Session = Depends(get_db)):
+    deletado = deletar_produto_service(db, id)
     if not deletado:
         raise HTTPException(status_code=404, detail="Produto não encontrado")
 
 
-@router.patch("/{produto_id}")
-def atualizar_produto(produto_id: int, produto: ProdutoUpdate, db: Session = Depends(get_db)):
-    return atualizar_produto_service(db, produto_id, produto)
+@router.patch("/{id}", response_model=ProdutoResponse)
+def atualizar_produto(id: int, produto: ProdutoUpdate, db: Session = Depends(get_db)):
+    produto_atualizado = atualizar_produto_service(db, id, produto)
+    if not produto_atualizado:
+        raise HTTPException(status_code=404, detail="Produto não encontrado")
+    return produto_atualizado

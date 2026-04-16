@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, Numeric, String
+from sqlalchemy import Column, Integer, Numeric, String, ForeignKey
 from sqlalchemy.orm import relationship
 from database.conexao import Base
 
@@ -11,12 +11,10 @@ class Produto(Base):
     nome = Column(String(255), nullable=False)
     descricao = Column(String(255), nullable=True)
     preco = Column(Numeric(10, 2), nullable=False)
-    unidade_id = Column(Integer, ForeignKey('unidades.id'), nullable=False)
+    unidade_id = Column(Integer, ForeignKey("unidades.id"), nullable=False)
     unidade = relationship("Unidade", back_populates="produtos")
     estoques = relationship("Estoque", back_populates="produto")
     items_pedido = relationship("ItemPedido", back_populates="produto")
 
-
     def __repr__(self):
-        return f"<Produto(id={self.id}, nome='{self.nome}', descricao='{self.descricao}', preco='{self.preco}', unidade_id='{self.unidade_id}')>"
-
+        return f"<Produto(id={self.id}, nome='{self.nome}', descricao='{self.descricao}', preco='{self.preco}')>"

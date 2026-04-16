@@ -11,6 +11,6 @@ from services.pedido_service import (
 
 router = APIRouter(prefix="/pedidos", tags=["Pedidos"])
 
-@router.get("/", response_model=list[(PedidoResponse)])
+@router.get("/", response_model=list[PedidoResponse])
 def listar_pedidos(db: Session = Depends(get_db)):
     return listar_pedidos_service(db)

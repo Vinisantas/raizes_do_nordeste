@@ -24,17 +24,17 @@ def listar_unidades(db: Session = Depends(get_db)):
     return listar_unidades_service(db)
 
 
-@router.get("/{unidade_id}", response_model=UnidadeResponse)
-def listar_unidade(unidade_id: int, db: Session = Depends(get_db)):
-    return listar_unidade_por_id_service(db, unidade_id)
+@router.get("/{id}", response_model=UnidadeResponse)
+def listar_unidade(id: int, db: Session = Depends(get_db)):
+    return listar_unidade_por_id_service(db, id)
 
 
-@router.delete("/{unidade_id}", status_code=204)
-def deletar_unidade(unidade_id: int, db: Session = Depends(get_db)):
-    deletar_unidade_service(db, unidade_id)
+@router.delete("/{id}", status_code=204)
+def deletar_unidade(id: int, db: Session = Depends(get_db)):
+    deletar_unidade_service(db, id)
 
 
-@router.patch("/{unidade_id}", response_model=UnidadeResponse)
-def atualizar_unidade(unidade_id: int, unidade: UnidadeUpdate, db: Session = Depends(get_db)):
-    return atualizar_unidade_service(db, unidade_id, unidade)
+@router.patch("/{id}", response_model=UnidadeResponse)
+def atualizar_unidade(id: int, unidade: UnidadeUpdate, db: Session = Depends(get_db)):
+    return atualizar_unidade_service(db, id, unidade)
 

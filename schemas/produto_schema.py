@@ -4,18 +4,31 @@ from pydantic import BaseModel
 
 class ProdutoBase(BaseModel):
     nome: str
-    descricao: str
+    descricao: str | None
     preco: Decimal
-    unidade_id: int
+
 
 class ProdutoCreate(ProdutoBase):
-    pass
+    unidade_id: int
 
-class ProdutoUpdate(ProdutoBase):
-    pass
 
-class ProdutoResponse(ProdutoBase):
+class ProdutoUpdate(BaseModel):
+    nome: str | None = None
+    descricao: str | None = None
+    preco: Decimal | None = None
+    unidade_id: int | None = None
+
+class UnidadeResponse(BaseModel):
     id: int
+    nome: str
+
+
+class ProdutoResponse(BaseModel):
+    id: int
+    nome: str
+    descricao: str | None
+    preco: Decimal
+    unidade: UnidadeResponse
 
     class Config:
-        orm_mode = True
+        from_attributes = True

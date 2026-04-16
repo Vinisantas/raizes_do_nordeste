@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from database.models.usuario import Usuario
 from schemas.usuario_schema import UsuarioCreate
@@ -8,7 +9,6 @@ def criar_usuario_service(db: Session, usuario: UsuarioCreate):
         email=usuario.email,
         senha=usuario.senha,
         role=usuario.role,
-        usuario_id=usuario.usuario_id
     )
     db.add(db_usuario)
     db.commit()
@@ -19,30 +19,31 @@ def criar_usuario_service(db: Session, usuario: UsuarioCreate):
 def listar_usuarios_service(db: Session):
     return db.query(Usuario).all()
 
-def listar_usuario_por_id_service(db: Session, usuario_id: int):
-    return db.query(Usuario).filter(Usuario.id == usuario_id).first()
+def listar_usuario_por_id_service(db: Session, id: int):
+    usuario = db.query(Usuario).filter(Usuario.id == id).all()
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+    return usuario
 
 
-def deletar_usuario_service(db: Session, usuario_id: int):
-    db_usuario = db.query(Usuario).filter(Usuario.id == usuario_id).first()
-    if db_usuario:
-        db.delete(db_usuario)
-        db.commit()
-        return True
-    return False
+def deletar_usuario_service(db: Session, id: int):
+    usuario = db.query(Usuario).filter(Usuario.id == id).first()
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+    db.delete(usuario)
+    db.commit()
 
 
-def atualizar_usuario_service(db: Session, usuario_id: int, usuario: UsuarioCreate):
-    db_usuario = db.query(Usuario).filter(Usuario.id == usuario_id).first()
-    if db_usuario:
-        db_usuario.nome = usuario.nome
-        db_usuario.email = usuario.email
-        db_usuario.senha = usuario.senha
-        db_usuario.role = usuario.role
-        db.commit()
-        db.refresh(db_usuario)
-        return db_usuario
-    return None
+def atualizar_usuario_service(db: Session, id: int, usuario: UsuarioCreate):
+    db_usuario = db.query(Usuario).filter(Usuario.id == id).first()
+    if not db_usuario:
+        raise HTTPException(status_code=404, detail="Unidade não encontrada")
+    dados = usuario.model_dump(exclude_unset=True)
+    for campo, valor in dados.items():
+        setattr(db_usuario, campo, valor)
+    db.commit()
+    db.refresh(db_usuario)
+    return db_usuario
 
 
 def authenticar_usuario_service(db: Session, email: str, senha: str):

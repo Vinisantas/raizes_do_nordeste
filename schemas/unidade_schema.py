@@ -3,13 +3,13 @@ from pydantic import BaseModel
 class UnidadeBase(BaseModel):
     nome: str
     endereco: str
-    unidade_id: int
-
+    
 class UnidadeCreate(UnidadeBase):
     pass
 
 class UnidadeUpdate(UnidadeBase):
-    pass
+    nome: str  | None = None
+    endereco: str  | None = None
 
 class UnidadeResponse(UnidadeBase):
     id: int

@@ -1,22 +1,24 @@
 from pydantic import BaseModel, EmailStr
+from database.models.usuario import RoleUsuario
 
 
 class UsuarioBase(BaseModel):
     nome: str
-    email: EmailStr
+    email: EmailStr 
     senha: str
-    role: str
-    usuario_id: int
+    role: RoleUsuario
 
 
 class UsuarioCreate(UsuarioBase):
     pass    
 
+class UsuarioUpdate(UsuarioBase):
+    nome: str | None = None
+    email: EmailStr | None = None
+    senha: str | None = None
+    role: RoleUsuario | None = None
 
-class UsuarioRead(UsuarioBase):
-    id: int
-
-class UsuarioResponse(UsuarioRead):
+class UsuarioResponse(UsuarioBase):
     id: int
 
     class Config:
