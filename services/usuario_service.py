@@ -17,7 +17,7 @@ def criar_usuario_service(db: Session, usuario: UsuarioCreate):
 
 
 def listar_usuarios_service(db: Session):
-    return db.query(Usuario).all()
+    return db.query(Usuario).all
 
 def listar_usuario_por_id_service(db: Session, id: int):
     usuario = db.query(Usuario).filter(Usuario.id == id).all()

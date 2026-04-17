@@ -1,5 +1,4 @@
-from fastapi import HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 from database.models.pedido import ItemPedido, Pedido
 from database.models.produto import Produto
 from schemas.pedido_schema import PedidoCreate, PedidoUpdate
@@ -8,7 +7,6 @@ from schemas.pedido_schema import PedidoCreate, PedidoUpdate
 def criar_pedido_service(db: Session, pedido: PedidoCreate):
     try:
         total = 0
-
         db_pedido = Pedido(
             usuario_id=pedido.usuario_id,
             unidade_id=pedido.unidade_id,
@@ -40,29 +38,39 @@ def criar_pedido_service(db: Session, pedido: PedidoCreate):
         raise
 
 
-def listar_pedidos_service(db : Session):
-    return db.query(Pedido).all()
+def listar_pedidos_service(db: Session):
+    return (
+        db.query(Pedido)
+        .options(
+            selectinload(Pedido.itens),
+            selectinload(Pedido.usuario),
+            selectinload(Pedido.unidade)
+        )
+        .all()
+    )
 
 
 def listar_pedido_por_id_service(db: Session, id: int):
     return db.query(Pedido).filter(Pedido.id == id).first()
 
 
-def deletar_pedido_service(db: Session, id: int):
-    db_pedido = listar_pedido_por_id_service(db , id)
+def deletar_pedido_service(db: Session, id: int) -> bool:
+    db_pedido = listar_pedido_por_id_service(db, id)
     if not db_pedido:
-        raise HTTPException(status_code=404, detail="Produto não encontrada")
+        return False
     db.delete(db_pedido)
     db.commit()
-    return db_pedido
+    return True
 
 
 
-def atualizar_pedido_service(db: Session, id: int, produto: PedidoUpdate):
+def atualizar_pedido_service(db: Session, id: int, pedido: PedidoUpdate):
     db_pedido = listar_pedido_por_id_service(db, id)
-    if db_pedido:
-        for key, value in produto.dict().items():
-            setattr(db_pedido, key, value)
-        db.commit()
-        db.refresh(db_pedido)
+    if not db_pedido:
+        return None
+    dados = pedido.model_dump(exclude_unset=True)
+    for key, value in dados.items():
+        setattr(db_pedido, key, value)
+    db.commit()
+    db.refresh(db_pedido)
     return db_pedido
