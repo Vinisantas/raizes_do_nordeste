@@ -1,20 +1,22 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
 from contextlib import asynccontextmanager
+from fastapi.responses import JSONResponse
 from controllers.autenticacao import router as auth_router
 from controllers.usuario_controller import router as usuarios_router
 from controllers.unidade_controller import router as unidades_router
 from controllers.produto_controller import router as produtos_router
 from controllers.pedido_controller import router as pedidos_router
 from database.conexao import init_db
+from schemas.response_schema import ApiResponse
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("🔥 Iniciando aplicação...")
+    print(" Iniciando aplicação...")
     init_db()
-    print("✅ Banco inicializado com sucesso!")
+    print(" Banco inicializado com sucesso!")
     yield
-    print("🛑 Finalizando aplicação...")
+    print(" Finalizando aplicação...")
 
 
 app = FastAPI(
@@ -23,7 +25,28 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Rotas
+@app.exception_handler(ValueError)
+async def value_error_handler(request: Request, exc: ValueError):
+    return JSONResponse(
+        status_code=400,
+        content=ApiResponse(
+            success=False,
+            error=str(exc)
+        ).model_dump()
+    )
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=ApiResponse(
+            success=False,
+            error=exc.detail
+        ).model_dump()
+    )
+
+
 app.include_router(auth_router)
 app.include_router(usuarios_router)
 app.include_router(unidades_router)

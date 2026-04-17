@@ -18,8 +18,11 @@ class UsuarioUpdate(UsuarioBase):
     senha: str | None = None
     role: RoleUsuario | None = None
 
-class UsuarioResponse(UsuarioBase):
+class UsuarioResponse(BaseModel):
     id: int
+    nome: str
+    email: EmailStr
+    role: RoleUsuario
 
     class Config:
-        orm_mode = True
+        from_attributes = True
