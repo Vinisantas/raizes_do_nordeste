@@ -1,16 +1,49 @@
-from fastapi import APIRouter
-from services.usuario_service import authenticar_usuario_service
+from http import HTTPStatus
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from database.conexao import get_db
+from database.models.usuario import Usuario
+from authentication.security import verifica_senha
+from schemas.response_schema import ApiResponse
+from services.token_service import cria_token_acesso
+
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-@router.get("/status")
-async def auth_status():
-    return {"status": "auth route"}
+@router.post('/token')
+def login_para_acesso_token(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db)
+):
+    cliente = db.scalar(
+        select(Usuario).where(Usuario.email == form_data.username)
+    )
 
-@router.post("/login")
-async def login(email: str, senha: str):
-    usuario = authenticar_usuario_service(email, senha)
-    if usuario:
-        return {"message": "Login successful", "user": usuario.nome}
-    return {"message": "Invalid credentials"}
+    if not cliente:
+        raise HTTPException(
+            status_code=HTTPStatus.UNAUTHORIZED,
+            detail="Email ou senha inválidos"
+        )
+
+    if not verifica_senha(form_data.password, cliente.senha):
+        raise HTTPException(
+            status_code=HTTPStatus.UNAUTHORIZED,
+            detail="Email ou senha inválidos"
+        )
+
+    access_token = cria_token_acesso(
+        data={"sub": cliente.email}
+    )
+
+    return ApiResponse(
+        success=True,
+        data={
+            "token_acesso": access_token,
+            "token_tipo": "bearer"
+        },
+        message="Login realizado com sucesso"
+)
