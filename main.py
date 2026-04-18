@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Request
 from contextlib import asynccontextmanager
 from fastapi.responses import JSONResponse
-from controllers.autenticacao import router as auth_router
+from controllers.autenticacao_controller import router as auth_router
 from controllers.usuario_controller import router as usuarios_router
 from controllers.unidade_controller import router as unidades_router
 from controllers.produto_controller import router as produtos_router
