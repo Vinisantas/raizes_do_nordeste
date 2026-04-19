@@ -1,6 +1,8 @@
+from fastapi import Query
 from sqlalchemy.orm import Session, selectinload
 from database.models.pedido import ItemPedido, Pedido
 from database.models.produto import Produto
+from enums.pedido_enum import CanalPedido
 from schemas.pedido_schema import PedidoCreate, PedidoUpdate
 
 
@@ -53,6 +55,11 @@ def listar_pedidos_service(db: Session):
 def listar_pedido_por_id_service(db: Session, id: int):
     return db.query(Pedido).filter(Pedido.id == id).first()
 
+
+def listar_por_canal_service(db: Session, canal_pedido: CanalPedido):
+    return db.query(Pedido).filter(
+        Pedido.canal_pedido == canal_pedido
+    ).all()
 
 def deletar_pedido_service(db: Session, id: int) -> bool:
     db_pedido = listar_pedido_por_id_service(db, id)

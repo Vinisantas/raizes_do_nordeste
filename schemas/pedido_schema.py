@@ -21,6 +21,8 @@ class PedidoUpdate(BaseModel):
     status: StatusPedido | None = None
     canal_pedido: CanalPedido | None = None
     itens: list[ItemPedidoCreate] | None = None
+
+    
 class PedidoResponse(BaseModel):
     id: int
     usuario_id: int

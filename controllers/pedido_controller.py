@@ -1,13 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from schemas.pedido_schema import PedidoCreate, PedidoResponse, PedidoUpdate
 from database.conexao import get_db
+from enums.pedido_enum import CanalPedido
 from services.pedido_service import (
     atualizar_pedido_service,
     criar_pedido_service,
     deletar_pedido_service,
     listar_pedido_por_id_service,
-    listar_pedidos_service)
+    listar_pedidos_service,
+    listar_por_canal_service)
 
 
 router = APIRouter(prefix="/pedidos", tags=["Pedidos"])
@@ -23,13 +25,24 @@ def listar_pedidos(db: Session = Depends(get_db)):
     return listar_pedidos_service(db)
 
 
+@router.get("/filtro")
+def listar_por_canal(
+    canal_pedido: CanalPedido,
+    db: Session = Depends(get_db)
+):
+    print("TIPO:", type(canal_pedido))
+    print("VALOR:", canal_pedido)
+
+    return listar_por_canal_service(db, canal_pedido)
+
+
 @router.get("/{id}", response_model=PedidoResponse)
 def listar_pedido(id: int, db: Session = Depends(get_db)):
     pedido = listar_pedido_por_id_service(db, id)
-
     if not pedido:
         raise HTTPException(status_code=404, detail="Pedido não encontrado")
     return pedido
+
 
 
 @router.delete("/{id}", status_code=204)

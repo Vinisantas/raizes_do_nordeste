@@ -1,23 +1,11 @@
-from sqlalchemy import Column, Enum, Integer, DateTime, ForeignKey, Numeric
-from enum import Enum as PyEnum
+from sqlalchemy import Column, Integer, DateTime, ForeignKey, Numeric
+from sqlalchemy import Enum as SAEnum
+from enum import Enum
+from enums.pedido_enum import CanalPedido, StatusPedido
 from database.conexao import Base
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 
-
-class StatusPedido(PyEnum):
-    PENDENTE = 'PENDENTE'
-    PREPARANDO = 'PREPARANDO'
-    PRONTO = 'PRONTO'
-    ENTREGUE = 'ENTREGUE'
-    CANCELADO = 'CANCELADO'
-
-class CanalPedido(PyEnum):
-    APP = 'APP'
-    TOTEM = 'TOTEM'
-    BALCAO = 'BALCAO'
-    PICKUP = 'PICKUP'
-    WEB = 'WEB'
 
 class Pedido(Base):
 
@@ -28,8 +16,8 @@ class Pedido(Base):
     unidade_id = Column(Integer, ForeignKey('unidades.id'), nullable=False)
     data_pedido = Column(DateTime(timezone=True), server_default=func.now())
     total = Column(Numeric(10, 2), nullable=False)
-    status = Column(Enum(StatusPedido), nullable=False)
-    canal_pedido = Column(Enum(CanalPedido), nullable=False)
+    status = Column(SAEnum(StatusPedido), nullable=False)
+    canal_pedido = Column(SAEnum(CanalPedido))
     usuario = relationship("Usuario", back_populates="pedidos")
     unidade = relationship("Unidade", back_populates="pedidos")
     itens = relationship("ItemPedido", back_populates="pedido", cascade="all, delete-orphan")
