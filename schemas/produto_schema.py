@@ -7,20 +7,15 @@ class ProdutoBase(BaseModel):
     descricao: str | None
     preco: Decimal
 
-
-class ProdutoCreate(ProdutoBase):
-    unidade_id: int
-
-
+class ProdutoCreate(BaseModel):
+    nome: str
+    descricao: str | None
+    preco: Decimal 
+    
 class ProdutoUpdate(BaseModel):
     nome: str | None = None
     descricao: str | None = None
     preco: Decimal | None = None
-    unidade_id: int | None = None
-
-class UnidadeResponse(BaseModel):
-    id: int
-    nome: str
 
 
 class ProdutoResponse(BaseModel):
@@ -28,7 +23,5 @@ class ProdutoResponse(BaseModel):
     nome: str
     descricao: str | None
     preco: Decimal
-    unidade: UnidadeResponse
-
     class Config:
         from_attributes = True

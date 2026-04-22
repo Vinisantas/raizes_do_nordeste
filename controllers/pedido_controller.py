@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from schemas.pedido_schema import PedidoCreate, PedidoResponse, PedidoUpdate
 from database.conexao import get_db
@@ -26,13 +26,7 @@ def listar_pedidos(db: Session = Depends(get_db)):
 
 
 @router.get("/filtro")
-def listar_por_canal(
-    canal_pedido: CanalPedido,
-    db: Session = Depends(get_db)
-):
-    print("TIPO:", type(canal_pedido))
-    print("VALOR:", canal_pedido)
-
+def listar_por_canal(canal_pedido: CanalPedido, db: Session = Depends(get_db)):
     return listar_por_canal_service(db, canal_pedido)
 
 

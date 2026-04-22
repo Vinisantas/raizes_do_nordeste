@@ -31,9 +31,8 @@ def listar_produto(id: int, db: Session = Depends(get_db)):
 
 @router.delete("/{id}", status_code=204)
 def deletar_produto(id: int, db: Session = Depends(get_db)):
-    deletado = deletar_produto_service(db, id)
-    if not deletado:
-        raise HTTPException(status_code=404, detail="Produto não encontrado")
+    deletar_produto_service(db, id)
+    return None 
 
 
 @router.patch("/{id}", response_model=ProdutoResponse)

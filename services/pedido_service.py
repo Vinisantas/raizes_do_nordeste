@@ -1,4 +1,3 @@
-from fastapi import Query
 from sqlalchemy.orm import Session, selectinload
 from database.models.pedido import ItemPedido, Pedido
 from database.models.produto import Produto
