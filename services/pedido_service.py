@@ -2,7 +2,9 @@ from sqlalchemy.orm import Session, selectinload
 from database.models.pedido import ItemPedido, Pedido
 from database.models.produto import Produto
 from enums.pedido_enum import CanalPedido
+from schemas.estoque_schema import EstoqueConsulta
 from schemas.pedido_schema import PedidoCreate, PedidoUpdate
+from services.estoque_service import saida_estoque_service
 
 
 def criar_pedido_service(db: Session, pedido: PedidoCreate):
@@ -21,8 +23,15 @@ def criar_pedido_service(db: Session, pedido: PedidoCreate):
             produto = db.query(Produto).filter(Produto.id == item.produto_id).first()
             if not produto:
                 raise ValueError(f"Produto {item.produto_id} não encontrado")
+            
+            saida_estoque_service(db, EstoqueConsulta(
+            produto_id=item.produto_id,
+            unidade_id=pedido.unidade_id,
+            quantidade=item.quantidade))
+
             subtotal = produto.preco * item.quantidade
             total += subtotal
+
             db_item = ItemPedido(
                 pedido_id=db_pedido.id,
                 produto_id=produto.id,
