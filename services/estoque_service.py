@@ -16,7 +16,6 @@ def criar_estoque_service(db: Session, estoque: EstoqueCreate):
     estoque_existente = buscar_estoque_por_produto(db, estoque.produto_id, estoque.unidade_id)
     if estoque_existente:
         estoque_existente.quantidade += estoque.quantidade
-        db.commit()
         db.refresh(estoque_existente)
         return estoque_existente
     novo_estoque = Estoque(
@@ -25,13 +24,12 @@ def criar_estoque_service(db: Session, estoque: EstoqueCreate):
         quantidade=estoque.quantidade
     )
     db.add(novo_estoque)
-    db.commit()
     db.refresh(novo_estoque)
     return novo_estoque
 
 
 ##função para consultar estoque por unidade 
-def consultar_estoque_por_unidade(db: Session , unidade_id: int):
+def listar_estoque_por_unidade(db: Session , unidade_id: int):
     unidade_estoque = db.query(Estoque).filter(Estoque.unidade_id == unidade_id).all() 
     if not unidade_estoque:
         return []
@@ -47,7 +45,7 @@ def saida_estoque_service(db: Session ,estoque: EstoqueConsulta):
             detail="Produto não encontrado no estoque dessa unidade"
         )
     verificar_disponibilidade(recebe_produto, estoque.quantidade)
-    dar_baixa_estoque(db, recebe_produto, estoque.quantidade)
+    baixa_estoque(db, recebe_produto, estoque.quantidade)
     return recebe_produto
 
 
@@ -60,7 +58,6 @@ def verificar_disponibilidade(estoque_db: Estoque, quantidade: int):
         )
 
 #reduzir ao vender
-def dar_baixa_estoque(db: Session ,estoque_db: Estoque, quantidade: int):
+def baixa_estoque(db: Session ,estoque_db: Estoque, quantidade: int):
     estoque_db.quantidade -= quantidade
-    db.commit()
     db.refresh(estoque_db)
