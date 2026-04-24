@@ -4,11 +4,16 @@ from database.models.estoque import Estoque
 from schemas.estoque_schema import EstoqueConsulta, EstoqueCreate
 
 
-def criar_estoque_service(db: Session, estoque: EstoqueCreate):
-    estoque_existente = db.query(Estoque).filter(
-        Estoque.produto_id == estoque.produto_id,
-        Estoque.unidade_id == estoque.unidade_id
+def buscar_estoque_por_produto(db: Session ,produto_id: int, unidade_id:int ):
+    busca = db.query(Estoque).filter(
+        Estoque.produto_id == produto_id,
+        Estoque.unidade_id == unidade_id
     ).first()
+    return busca
+    
+
+def criar_estoque_service(db: Session, estoque: EstoqueCreate):
+    estoque_existente = buscar_estoque_por_produto(db, estoque.produto_id, estoque.unidade_id)
     if estoque_existente:
         estoque_existente.quantidade += estoque.quantidade
         db.commit()
@@ -34,38 +39,28 @@ def consultar_estoque_por_unidade(db: Session , unidade_id: int):
 
 
 
-def saida_estoque_service(db: Session , estoque: EstoqueConsulta):
-    recebe_produto = db.query(Estoque).filter(
-        Estoque.produto_id == estoque.produto_id,
-        Estoque.unidade_id == estoque.unidade_id
-    ).first()
+def saida_estoque_service(db: Session ,estoque: EstoqueConsulta):
+    recebe_produto = buscar_estoque_por_produto(db, estoque.produto_id, estoque.unidade_id)
     if not recebe_produto:
         raise HTTPException(
             status_code=404,
             detail="Produto não encontrado no estoque dessa unidade"
         )
-    if recebe_produto.quantidade < estoque.quantidade:
+    verificar_disponibilidade(recebe_produto, estoque.quantidade)
+    dar_baixa_estoque(db, recebe_produto, estoque.quantidade)
+    return recebe_produto
+
+
+#validar antes do pedido (importante!)
+def verificar_disponibilidade(estoque_db: Estoque, quantidade: int):
+    if estoque_db.quantidade < quantidade:
         raise HTTPException(
             status_code=400,
             detail="Estoque insuficiente"
         )
-    else:
-        recebe_produto.quantidade -= estoque.quantidade
-        db.commit()
-        db.refresh(recebe_produto)
-        return recebe_produto
-    
-
-
-
-##função para consultar estoque por produto
-def consultar_estoque_por_produto():
-    pass
-
-#validar antes do pedido (importante!)
-def verificar_disponibilidade():
-    pass
 
 #reduzir ao vender
-def dar_baixa_estoque():
-    pass
+def dar_baixa_estoque(db: Session ,estoque_db: Estoque, quantidade: int):
+    estoque_db.quantidade -= quantidade
+    db.commit()
+    db.refresh(estoque_db)
