@@ -6,6 +6,7 @@ from controllers.usuario_controller import router as usuarios_router
 from controllers.unidade_controller import router as unidades_router
 from controllers.produto_controller import router as produtos_router
 from controllers.pedido_controller import router as pedidos_router
+from controllers.estoque_controller import router as estoques_router
 from database.conexao import init_db
 from schemas.response_schema import ApiResponse
 
@@ -52,6 +53,7 @@ app.include_router(usuarios_router)
 app.include_router(unidades_router)
 app.include_router(produtos_router)
 app.include_router(pedidos_router)
+app.include_router(estoques_router)
 
 
 @app.get("/")

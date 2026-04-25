@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from authentication.security import busca_senha_hash, verifica_senha
+from authentication.security import criar_hash_senha, verificar_senha
 from database.models.usuario import Usuario
 from schemas.usuario_schema import UsuarioCreate, UsuarioUpdate
 
@@ -9,7 +9,7 @@ def criar_usuario_service(db: Session, usuario: UsuarioCreate):
         db_usuario = Usuario(
             nome=usuario.nome,
             email=usuario.email,
-            senha=busca_senha_hash(usuario.senha),
+            senha=criar_hash_senha(usuario.senha),
             role=usuario.role,
         )
         db.add(db_usuario)
@@ -46,7 +46,7 @@ def atualizar_usuario_service(db: Session, id: int, usuario: UsuarioUpdate):
         raise ValueError("Usuário não encontrado")
     dados = usuario.model_dump(exclude_unset=True)
     if "senha" in dados:
-        dados["senha"] = busca_senha_hash(dados["senha"])
+        dados["senha"] = criar_hash_senha(dados["senha"])
     for campo, valor in dados.items():
         setattr(db_usuario, campo, valor)
     db.commit()
@@ -58,6 +58,6 @@ def autenticar_usuario_service(db: Session, email: str, senha: str):
     usuario = db.query(Usuario).filter(Usuario.email == email).first()
     if not usuario:
         return None
-    if not verifica_senha(senha, usuario.senha):
+    if not verificar_senha(senha, usuario.senha):
         return None
     return usuario

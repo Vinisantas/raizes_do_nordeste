@@ -24,6 +24,7 @@ def criar_estoque_service(db: Session, estoque: EstoqueCreate):
         quantidade=estoque.quantidade
     )
     db.add(novo_estoque)
+    db.commit()
     db.refresh(novo_estoque)
     return novo_estoque
 
@@ -60,4 +61,5 @@ def verificar_disponibilidade(estoque_db: Estoque, quantidade: int):
 #reduzir ao vender
 def baixa_estoque(db: Session ,estoque_db: Estoque, quantidade: int):
     estoque_db.quantidade -= quantidade
+    db.commit()
     db.refresh(estoque_db)

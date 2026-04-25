@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from authentication.security import get_current_user
 from database.conexao import get_db
 from schemas.response_schema import ApiResponse
 from schemas.usuario_schema import UsuarioCreate, UsuarioResponse, UsuarioUpdate
@@ -35,7 +36,12 @@ def listar_usuarios(db: Session = Depends(get_db)):
     )
 
 
-@router.get("/{id}", response_model=ApiResponse)
+@router.get("/me")
+def get_me(user = Depends(get_current_user)):
+    return user
+
+
+@router.get("/{id:int}", response_model=ApiResponse)
 def listar_usuario(id: int, db: Session = Depends(get_db)):
     usuario = listar_usuario_por_id_service(db, id)
     return ApiResponse(

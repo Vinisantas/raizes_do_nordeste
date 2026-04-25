@@ -10,7 +10,10 @@ class UsuarioBase(BaseModel):
 
 
 class UsuarioCreate(UsuarioBase):
-    pass    
+    nome: str
+    email: EmailStr 
+    senha: str
+    role: RoleUsuario  
 
 class UsuarioUpdate(UsuarioBase):
     nome: str | None = None

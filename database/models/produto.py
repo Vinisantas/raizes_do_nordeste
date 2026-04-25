@@ -11,8 +11,10 @@ class Produto(Base):
     nome = Column(String(255), nullable=False)
     descricao = Column(String(255), nullable=True)
     preco = Column(Numeric(10, 2), nullable=False)
+    unidade_id = Column(Integer, ForeignKey("unidades.id"))
     estoque = relationship("Estoque", back_populates="produto")
     items_pedido = relationship("ItemPedido", back_populates="produto")
+    unidade = relationship("Unidade", back_populates="produtos")
 
     def __repr__(self):
-        return f"<Produto(id={self.id}, nome='{self.nome}', descricao='{self.descricao}', preco='{self.preco}')>"
+        return f"<Produto(id={self.id}, nome='{self.nome}', unidade_id={self.unidade_id}', descricao='{self.descricao}', preco='{self.preco}')>"
