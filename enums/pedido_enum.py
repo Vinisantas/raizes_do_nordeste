@@ -1,8 +1,7 @@
 from enum import Enum
 
 class StatusPedido(str, Enum):
-    PENDENTE = 'PENDENTE'
-    PREPARANDO = 'PREPARANDO'
+    COZINHA = 'COZINHA'
     PRONTO = 'PRONTO'
     ENTREGUE = 'ENTREGUE'
     CANCELADO = 'CANCELADO'

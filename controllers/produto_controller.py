@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from authentication.security import require_role
 from database.conexao import get_db
+from database.models.usuario import Usuario
 from schemas.produto_schema import ProdutoCreate, ProdutoUpdate, ProdutoResponse
 from services.produto_service import (
     criar_produto_service,
@@ -15,8 +17,12 @@ router = APIRouter(prefix="/produtos", tags=["Produtos"])
 
 
 @router.post("/", response_model=ProdutoResponse, status_code=201)
-def criar_produto(produto: ProdutoCreate, db: Session = Depends(get_db)):
-    return criar_produto_service(db, produto)
+def criar_produto(
+    produto: ProdutoCreate,
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(require_role("ADMIN", "GERENTE"))
+):
+    return criar_produto_service(db, produto, current_user)  
 
 
 @router.get("/", response_model=list[ProdutoResponse])

@@ -9,15 +9,15 @@ from database.models.usuario import Usuario
 from pwdlib import PasswordHash
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
-pwd_context = PasswordHash.recommended()
-
-
-def criar_hash_senha(password: str):
-    return pwd_context.hash(password)
+password_hash = PasswordHash.recommended()
 
 
 def verificar_senha(plain_password: str, hashed_password: str):
-    return pwd_context.verify(plain_password, hashed_password)
+    return password_hash.verify(plain_password, hashed_password)
+
+
+def criar_hash_senha(password: str):
+    return password_hash.hash(password)
 
 
 def decode_token(token: str):
@@ -38,14 +38,13 @@ async def get_current_user(
     user = db.query(Usuario).filter(Usuario.email == email).first()
     if not user:
         raise HTTPException(status_code=401, detail="Usuário não encontrado")
-
     return user
 
 
 
 def require_role(*roles):
     def role_checker(user = Depends(get_current_user)):
-        if user.role not in roles:
+        if user.role.lower() not in [r.lower() for r in roles]:
             raise HTTPException(
                 status_code=403,
                 detail="Sem permissão"
