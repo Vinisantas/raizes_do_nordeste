@@ -4,7 +4,7 @@ from database.models.produto import Produto
 from schemas.produto_schema import  ProdutoCreate, ProdutoUpdate
 
 
-def criar_produto_service(db: Session, produto: ProdutoCreate):
+def criar_produto_service(db: Session, produto: ProdutoCreate, current_user):
     db_produto = Produto(
         nome = produto.nome,
         descricao = produto.descricao,
@@ -26,7 +26,7 @@ def listar_produto_por_id_service(db: Session, id: int):
     return produto
 
 
-def deletar_produto_service(db: Session, id: int) -> bool:
+def deletar_produto_service(db: Session, id: int):
     produto = db.query(Produto).filter(Produto.id == id).first()
     if not produto :
         raise HTTPException(status_code=404, detail="Produto não encontrado")

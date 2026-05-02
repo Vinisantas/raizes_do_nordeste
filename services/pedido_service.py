@@ -1,7 +1,8 @@
+from fastapi import HTTPException
 from sqlalchemy.orm import Session, selectinload
 from database.models.pedido import ItemPedido, Pedido
 from database.models.produto import Produto
-from enums.pedido_enum import CanalPedido
+from enums.pedido_enum import TRANSICOES, CanalPedido
 from schemas.estoque_schema import EstoqueConsulta
 from schemas.pedido_schema import PedidoCreate, PedidoUpdate
 from services.estoque_service import saida_estoque_service
@@ -23,15 +24,12 @@ def criar_pedido_service(db: Session, pedido: PedidoCreate):
             produto = db.query(Produto).filter(Produto.id == item.produto_id).first()
             if not produto:
                 raise ValueError(f"Produto {item.produto_id} não encontrado")
-            
             saida_estoque_service(db, EstoqueConsulta(
             produto_id=item.produto_id,
             unidade_id=pedido.unidade_id,
             quantidade=item.quantidade))
-
             subtotal = produto.preco * item.quantidade
             total += subtotal
-
             db_item = ItemPedido(
                 pedido_id=db_pedido.id,
                 produto_id=produto.id,
@@ -69,6 +67,7 @@ def listar_por_canal_service(db: Session, canal_pedido: CanalPedido):
         Pedido.canal_pedido == canal_pedido
     ).all()
 
+
 def deletar_pedido_service(db: Session, id: int) -> bool:
     db_pedido = listar_pedido_por_id_service(db, id)
     if not db_pedido:
@@ -89,3 +88,18 @@ def atualizar_pedido_service(db: Session, id: int, pedido: PedidoUpdate):
     db.commit()
     db.refresh(db_pedido)
     return db_pedido
+
+
+def atualizar_status_service(db: Session, id: int, novo_status):
+    db_status = listar_pedido_por_id_service(db, id)
+    if not db_status:
+        raise HTTPException(status_code=404, detail="Pedido não encontrado")
+    proximos_possiveis = TRANSICOES.get(db_status,[])
+    if novo_status not in proximos_possiveis:
+        raise HTTPException(
+            status_code=400,
+            detail="Transição inválida: Não é possível mudar de {pedido_db.status} para {novo_status}")
+    db_status.status = novo_status
+    db.commit()
+    db.refresh(db_status)
+    return db_status

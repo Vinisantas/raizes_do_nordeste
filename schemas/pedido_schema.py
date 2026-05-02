@@ -11,14 +11,13 @@ class ItemPedidoCreate(BaseModel):
 class PedidoCreate(BaseModel):
     usuario_id: int
     unidade_id: int
-    status: StatusPedido
+    status: StatusPedido = StatusPedido.COZINHA
     canal_pedido: CanalPedido
     itens: list[ItemPedidoCreate]
 
 class PedidoUpdate(BaseModel):
     usuario_id: int | None = None
     unidade_id: int | None = None
-    status: StatusPedido | None = None
     canal_pedido: CanalPedido | None = None
     itens: list[ItemPedidoCreate] | None = None
 
@@ -30,7 +29,6 @@ class PedidoResponse(BaseModel):
     total: Decimal
     status: StatusPedido
     canal_pedido: CanalPedido
-
     class Config:
         from_attributes = True
 
