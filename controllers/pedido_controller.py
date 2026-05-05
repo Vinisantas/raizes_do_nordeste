@@ -1,5 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from authentication.security import require_role
+from database.models.usuario import Usuario
+from database.models.usuario import Usuario
 from schemas.pedido_schema import PedidoCreate, PedidoResponse, PedidoUpdate
 from database.conexao import get_db
 from enums.pedido_enum import CanalPedido, StatusPedido
@@ -56,8 +59,16 @@ def atualizar_pedido(id: int, pedido: PedidoUpdate, db: Session = Depends(get_db
     return pedido_atualizado
 
 @router.patch("/{id}/status", response_model=PedidoResponse)
-def atualizar_status_pedido(id: int, novo_status: StatusPedido , db: Session = Depends(get_db)):
-    status_atualizado = atualizar_status_service(id=id,novo_status=novo_status,db=db)
+def atualizar_status_pedido(id: int,
+                            novo_status: StatusPedido,
+                            db: Session = Depends(get_db),
+                            current_user: Usuario = Depends(require_role("ADMIN", "GERENTE"))):
+    status_atualizado = atualizar_status_service(
+        id=id,
+        novo_status=novo_status,
+        db=db,
+        current_user=current_user
+)
     if not status_atualizado:
         raise HTTPException(status_code=404, detail="Pedido não encontrado")
     return status_atualizado

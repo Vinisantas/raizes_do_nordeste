@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session, selectinload
 from database.models.pedido import ItemPedido, Pedido
 from database.models.produto import Produto
+from database.models.usuario import Usuario
 from enums.pedido_enum import TRANSICOES, CanalPedido, StatusPedido
 from schemas.estoque_schema import EstoqueConsulta
 from schemas.pedido_schema import PedidoCreate, PedidoUpdate
@@ -91,7 +92,11 @@ def atualizar_pedido_service(db: Session, id: int, pedido: PedidoUpdate):
     return db_pedido
 
 
-def atualizar_status_service( id: int, novo_status, db: Session):
+def atualizar_status_service(
+         id: int,
+         novo_status,
+         db: Session,
+         current_user):
     pedido = listar_pedido_por_id_service(db, id)
     if not pedido:
         raise HTTPException(status_code=404, detail="Pedido não encontrado")
