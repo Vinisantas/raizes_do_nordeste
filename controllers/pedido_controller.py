@@ -57,7 +57,7 @@ def atualizar_pedido(id: int, pedido: PedidoUpdate, db: Session = Depends(get_db
 
 @router.patch("/{id}/status", response_model=PedidoResponse)
 def atualizar_status_pedido(id: int, novo_status: StatusPedido , db: Session = Depends(get_db)):
-    status_atualizado = atualizar_status_service(db, id, novo_status)
+    status_atualizado = atualizar_status_service(id=id,novo_status=novo_status,db=db)
     if not status_atualizado:
         raise HTTPException(status_code=404, detail="Pedido não encontrado")
     return status_atualizado

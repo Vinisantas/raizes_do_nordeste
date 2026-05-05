@@ -29,7 +29,7 @@ def criar_estoque_service(db: Session, estoque: EstoqueCreate):
     return novo_estoque
 
 
-##função para consultar estoque por unidade 
+
 def listar_estoque_por_unidade(db: Session , unidade_id: int):
     unidade_estoque = db.query(Estoque).filter(Estoque.unidade_id == unidade_id).all() 
     if not unidade_estoque:
@@ -50,7 +50,7 @@ def saida_estoque_service(db: Session ,estoque: EstoqueConsulta):
     return recebe_produto
 
 
-#validar antes do pedido (importante!)
+
 def verificar_disponibilidade(estoque_db: Estoque, quantidade: int):
     if estoque_db.quantidade < quantidade:
         raise HTTPException(
@@ -58,8 +58,6 @@ def verificar_disponibilidade(estoque_db: Estoque, quantidade: int):
             detail="Estoque insuficiente"
         )
 
-#reduzir ao vender
+
 def baixa_estoque(db: Session ,estoque_db: Estoque, quantidade: int):
     estoque_db.quantidade -= quantidade
-    db.commit()
-    db.refresh(estoque_db)
