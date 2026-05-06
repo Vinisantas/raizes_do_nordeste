@@ -1,16 +1,32 @@
 services:
-  
-  fastapi:
-    build: .
-    env_file:
-      - .env
-    container_name: fastapi_app
-    restart: always
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     depends_on:
+      - payment
       - postgres
+    volumes:
+      - ./shared:/app/shared
+    networks:
+      - app-network
 
+  payment:
+    build:
+      context: .
+      dockerfile: payment/mock_pagamento/Dockerfile
+    ports:
+      - "8001:8001"
+    env_file:
+      - .env
+    volumes:
+      - ./shared:/app/shared
+    networks:
+      - app-network
 
   postgres:
     image: postgres:16-alpine
@@ -24,8 +40,12 @@ services:
       - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - app-network
 
-  
-      
+networks:
+  app-network:
+    driver: bridge
+
 volumes:
   pgdata:

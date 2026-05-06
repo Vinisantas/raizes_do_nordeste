@@ -1,0 +1,5 @@
+{
+    "status" : "error",
+    "message" : "Pagamento recusado. Verifique os detalhes do cartão e tente novamente.",
+    "transacao_id" : "1234567890"
+}
