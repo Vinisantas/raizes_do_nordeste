@@ -1,4 +1,5 @@
 from decimal import Decimal
+from typing import Literal
 from pydantic import BaseModel, field_validator
 from api.database.models.pedido import StatusPedido, CanalPedido
 from shared.enums.pagamento_enum import MetodoPagamento
@@ -14,7 +15,8 @@ class PedidoCreate(BaseModel):
     unidade_id: int
     status: StatusPedido = StatusPedido.COZINHA
     canal_pedido: CanalPedido
-    forma_pagamento: list[MetodoPagamento]
+    forma_pagamento: MetodoPagamento
+    simulacao_pagamento: Literal["success", "error", "pending"] = "success"
     itens: list[ItemPedidoCreate]
 
 class PedidoUpdate(BaseModel):

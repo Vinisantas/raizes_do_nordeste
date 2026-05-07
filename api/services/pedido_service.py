@@ -9,7 +9,7 @@ from api.database.models.pagamento import Pagamento as PagamentoModel
 from api.services.pagamento_service import processar_pagamento
 from api.services.estoque_service import entrada_estoque_service, saida_estoque_service
 
-from shared.enums.pagamento_enum import MetodoPagamento, StatusPagamento
+from shared.enums.pagamento_enum import StatusPagamento
 from shared.enums.pedido_enum import TRANSICOES, CanalPedido, StatusPedido
 from shared.schemas.estoque_schema import EstoqueConsulta
 from shared.schemas.pedido_schema import PedidoCreate, PedidoUpdate
@@ -51,7 +51,9 @@ async def criar_pedido_service(db: Session, pedido: PedidoCreate):
         db_pedido.total = total
         resultado_pagamento = await processar_pagamento(
             db_pedido.id,
-            float(total),"success")
+            float(total),
+            pedido.simulacao_pagamento
+        )
         novo_pagamento = PagamentoModel(
             pedido_id=db_pedido.id,
             valor=total,
@@ -64,6 +66,10 @@ async def criar_pedido_service(db: Session, pedido: PedidoCreate):
             novo_pagamento.status = StatusPagamento.SUCCESS
             novo_pagamento.data_pagamento = datetime.utcnow()
             print(f"Pagamento aprovado para pedido {db_pedido.id}")
+        elif resultado_pagamento["status"] == "pending":
+            db_pedido.status = StatusPedido.AGUARDANDO_PAGAMENTO
+            novo_pagamento.status = StatusPagamento.PENDING
+            print(f"Pagamento pendente para pedido {db_pedido.id}")
         else:
             db_pedido.status = StatusPedido.CANCELADO
             novo_pagamento.status = StatusPagamento.ERROR
