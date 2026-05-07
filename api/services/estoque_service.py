@@ -49,7 +49,24 @@ def saida_estoque_service(db: Session ,estoque: EstoqueConsulta):
     baixa_estoque(db, recebe_produto, estoque.quantidade)
     return recebe_produto
 
-
+def entrada_estoque_service(db: Session, estoque: EstoqueConsulta):
+    db_estoque = (
+        db.query(Estoque)
+        .filter(
+            Estoque.produto_id == estoque.produto_id,
+            Estoque.unidade_id == estoque.unidade_id
+        )
+        .first()
+    )
+    if not db_estoque:
+        raise HTTPException(
+            status_code=404,
+            detail="Estoque não encontrado"
+        )
+    db_estoque.quantidade += estoque.quantidade
+    db.commit()
+    db.refresh(db_estoque)
+    return db_estoque
 
 def verificar_disponibilidade(estoque_db: Estoque, quantidade: int):
     if estoque_db.quantidade < quantidade:

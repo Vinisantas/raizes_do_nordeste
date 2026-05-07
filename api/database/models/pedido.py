@@ -1,6 +1,5 @@
-from sqlalchemy import Column, Integer, DateTime, ForeignKey, Numeric
+from sqlalchemy import Column, Integer, DateTime, ForeignKey, Numeric, String
 from sqlalchemy import Enum as SAEnum
-from enum import Enum
 from shared.enums.pedido_enum import CanalPedido, StatusPedido
 from api.database.conexao import Base
 from sqlalchemy.sql import func
@@ -16,8 +15,8 @@ class Pedido(Base):
     unidade_id = Column(Integer, ForeignKey('unidades.id'), nullable=False)
     data_pedido = Column(DateTime(timezone=True), server_default=func.now())
     total = Column(Numeric(10, 2), nullable=False)
-    status = Column(SAEnum(StatusPedido), nullable=False)
-    canal_pedido = Column(SAEnum(CanalPedido))
+    status = Column(String(30), nullable=False)
+    canal_pedido = Column(String(20), nullable=False)
     usuario = relationship("Usuario", back_populates="pedidos")
     unidade = relationship("Unidade", back_populates="pedidos")
     itens = relationship("ItemPedido", back_populates="pedido", cascade="all, delete-orphan")

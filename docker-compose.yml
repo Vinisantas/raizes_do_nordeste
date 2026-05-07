@@ -3,15 +3,23 @@ services:
     build:
       context: .
       dockerfile: api/Dockerfile
+
     ports:
       - "8000:8000"
+
     env_file:
       - .env
+
     depends_on:
-      - payment
-      - postgres
+      postgres:
+        condition: service_healthy
+
+      payment:
+        condition: service_started
+
     volumes:
       - ./shared:/app/shared
+
     networks:
       - app-network
 
@@ -19,12 +27,16 @@ services:
     build:
       context: .
       dockerfile: payment/mock_pagamento/Dockerfile
+
     ports:
       - "8001:8001"
+
     env_file:
       - .env
+
     volumes:
       - ./shared:/app/shared
+
     networks:
       - app-network
 
@@ -32,16 +44,26 @@ services:
     image: postgres:16-alpine
     container_name: postgres_db
     restart: always
+
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: raizes_do_nordeste
+
     ports:
       - "5433:5432"
+
     volumes:
       - pgdata:/var/lib/postgresql/data
+
     networks:
       - app-network
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 networks:
   app-network:

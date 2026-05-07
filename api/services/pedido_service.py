@@ -1,52 +1,97 @@
+from datetime import datetime
 from fastapi import HTTPException
 from sqlalchemy.orm import Session, selectinload
+
 from api.database.models.pedido import ItemPedido, Pedido
 from api.database.models.produto import Produto
-from api.database.models.usuario import Usuario
+from api.database.models.pagamento import Pagamento as PagamentoModel
+
+from api.services.pagamento_service import processar_pagamento
+from api.services.estoque_service import entrada_estoque_service, saida_estoque_service
+
+from shared.enums.pagamento_enum import MetodoPagamento, StatusPagamento
 from shared.enums.pedido_enum import TRANSICOES, CanalPedido, StatusPedido
 from shared.schemas.estoque_schema import EstoqueConsulta
 from shared.schemas.pedido_schema import PedidoCreate, PedidoUpdate
-from api.services.estoque_service import saida_estoque_service
 
 
-def criar_pedido_service(db: Session, pedido: PedidoCreate):
+async def criar_pedido_service(db: Session, pedido: PedidoCreate):
+
     try:
         total = 0
+        itens_processados = []
         db_pedido = Pedido(
             usuario_id=pedido.usuario_id,
             unidade_id=pedido.unidade_id,
-            status=pedido.status,
             canal_pedido=pedido.canal_pedido,
-            total=0)
+            status=StatusPedido.AGUARDANDO_PAGAMENTO,
+            total=0
+        )
         db.add(db_pedido)
         db.flush()
         for item in pedido.itens:
-            qtd_pedida = item.quantidade
-            produto = db.query(Produto).filter(Produto.id == item.produto_id).first()
+            produto = (
+                db.query(Produto)
+                .filter(Produto.id == item.produto_id)
+                .first())
             if not produto:
-                raise ValueError(f"Produto {item.produto_id} não encontrado")
-            saida_estoque_service(db, EstoqueConsulta(
-            produto_id=item.produto_id,
-            unidade_id=pedido.unidade_id,
-            quantidade=qtd_pedida))
-
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"Produto {item.produto_id} não encontrado")
+            qtd = item.quantidade
+            saida_estoque_service(
+                db,
+                EstoqueConsulta(
+                    produto_id=item.produto_id,
+                    unidade_id=pedido.unidade_id,
+                    quantidade=qtd))
             db_item = ItemPedido(
                 pedido_id=db_pedido.id,
                 produto_id=produto.id,
-                quantidade=qtd_pedida,
-                preco_unitario=produto.preco
-            )
+                quantidade=qtd,
+                preco_unitario=produto.preco)
             db.add(db_item)
-            total += (produto.preco * qtd_pedida)
-
+            total += produto.preco * qtd
+            itens_processados.append({
+                "produto_id": produto.id,
+                "quantidade": qtd})
         db_pedido.total = total
+        resultado_pagamento = await processar_pagamento(
+            db_pedido.id,
+            float(total),
+            "success")
+        novo_pagamento = PagamentoModel(
+            pedido_id=db_pedido.id,
+            valor=total,
+            metodo_pagamento=MetodoPagamento.PIX,
+            transacao_id=resultado_pagamento.get("transacao_id"),
+            resposta_gateway=resultado_pagamento
+        )
+        if resultado_pagamento["status"] == "success":
+            db_pedido.status = StatusPedido.COZINHA
+            novo_pagamento.status = StatusPagamento.SUCCESS
+            novo_pagamento.data_pagamento = datetime.utcnow()
+            print(f"Pagamento aprovado para pedido {db_pedido.id}")
+        else:
+            db_pedido.status = StatusPedido.CANCELADO
+            novo_pagamento.status = StatusPagamento.ERROR
+            for item in itens_processados:
+                entrada_estoque_service(
+                    db,
+                    EstoqueConsulta(
+                        produto_id=item["produto_id"],
+                        unidade_id=pedido.unidade_id,
+                        quantidade=item["quantidade"]))
+            print(f"Pagamento recusado para pedido {db_pedido.id}")
+        db.add(novo_pagamento)
         db.commit()
         db.refresh(db_pedido)
+        print(f"Pedido {db_pedido.id} criado com sucesso")
         return db_pedido
     except Exception as e:
         db.rollback()
+        print(f"Erro ao criar pedido: {str(e)}")
         raise e
-
 
 def listar_pedidos_service(db: Session):
     return (

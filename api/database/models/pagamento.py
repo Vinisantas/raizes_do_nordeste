@@ -13,6 +13,6 @@ class Pagamento(Base):
     metodo_pagamento = Column(Enum(MetodoPagamento), nullable=False)
     status = Column(Enum(StatusPagamento), nullable=False)
     transacao_id = Column(Integer, nullable=True)
-    resposta_gateway = Column(JSON, nullable=True)  # 🔥 diferencial
+    resposta_gateway = Column(JSON, nullable=True)
     data_pagamento = Column(DateTime, default=datetime.utcnow)
     pedido = relationship("Pedido", back_populates="pagamento")

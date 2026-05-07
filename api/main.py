@@ -9,6 +9,7 @@ from api.controllers.pedido_controller import router as pedidos_router
 from api.controllers.estoque_controller import router as estoques_router
 from api.database.conexao import init_db
 from shared.schemas.response_schema import ApiResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 
 @asynccontextmanager
@@ -47,6 +48,13 @@ async def http_exception_handler(request: Request, exc: HTTPException):
         ).model_dump()
     )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(auth_router)
 app.include_router(usuarios_router)

@@ -1,13 +1,14 @@
 from enum import Enum
 
 class StatusPedido(str, Enum):
-    COZINHA = 'Cozinha'
-    PRONTO = 'Pronto'
-    ENTREGUE = 'Entregue'
-    CANCELADO = 'Cancelado'
-
+    AGUARDANDO_PAGAMENTO = "AGUARDANDO_PAGAMENTO"
+    COZINHA = "COZINHA"
+    PRONTO = "PRONTO"
+    ENTREGUE = "ENTREGUE"
+    CANCELADO = "CANCELADO"
 
 TRANSICOES = {
+    StatusPedido.AGUARDANDO_PAGAMENTO: [StatusPedido.CANCELADO, StatusPedido.COZINHA],
     StatusPedido.COZINHA: [StatusPedido.PRONTO, StatusPedido.CANCELADO],
     StatusPedido.PRONTO: [StatusPedido.ENTREGUE],
     StatusPedido.ENTREGUE: [],

@@ -15,4 +15,5 @@ dependencies = [
     "dotenv>=0.9.9",
     "python-jose>=3.5.0",
     "requests>=2.33.1",
+    "httpx>=0.28.1",
 ]
