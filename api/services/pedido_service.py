@@ -30,18 +30,11 @@ async def criar_pedido_service(db: Session, pedido: PedidoCreate):
         db.add(db_pedido)
         db.flush()
         for item in pedido.itens:
-            produto = (
-                db.query(Produto)
-                .filter(Produto.id == item.produto_id)
-                .first())
+            produto = (db.query(Produto).filter(Produto.id == item.produto_id).first())
             if not produto:
-                raise HTTPException(
-                    status_code=404,
-                    detail=f"Produto {item.produto_id} não encontrado")
+                raise HTTPException(status_code=404,detail=f"Produto {item.produto_id} não encontrado")
             qtd = item.quantidade
-            saida_estoque_service(
-                db,
-                EstoqueConsulta(
+            saida_estoque_service(db,EstoqueConsulta(
                     produto_id=item.produto_id,
                     unidade_id=pedido.unidade_id,
                     quantidade=qtd))
@@ -58,12 +51,11 @@ async def criar_pedido_service(db: Session, pedido: PedidoCreate):
         db_pedido.total = total
         resultado_pagamento = await processar_pagamento(
             db_pedido.id,
-            float(total),
-            "success")
+            float(total),"success")
         novo_pagamento = PagamentoModel(
             pedido_id=db_pedido.id,
             valor=total,
-            metodo_pagamento=MetodoPagamento.PIX,
+            metodo_pagamento=pedido.forma_pagamento,
             transacao_id=resultado_pagamento.get("transacao_id"),
             resposta_gateway=resultado_pagamento
         )

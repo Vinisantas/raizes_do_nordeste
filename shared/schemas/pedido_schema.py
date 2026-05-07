@@ -1,6 +1,7 @@
 from decimal import Decimal
 from pydantic import BaseModel, field_validator
 from api.database.models.pedido import StatusPedido, CanalPedido
+from shared.enums.pagamento_enum import MetodoPagamento
 
 
 class ItemPedidoCreate(BaseModel):
@@ -13,6 +14,7 @@ class PedidoCreate(BaseModel):
     unidade_id: int
     status: StatusPedido = StatusPedido.COZINHA
     canal_pedido: CanalPedido
+    forma_pagamento: list[MetodoPagamento]
     itens: list[ItemPedidoCreate]
 
 class PedidoUpdate(BaseModel):

@@ -1,5 +1,9 @@
+from typing import Optional
+from fastapi import Query
+
+
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import  Session
 from api.authentication.security import require_role
 from api.database.models.usuario import Usuario
 from api.database.models.usuario import Usuario
@@ -25,18 +29,17 @@ async def criar_pedido(pedido: PedidoCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=list[PedidoResponse])
-async def listar_pedidos(db: Session = Depends(get_db)):
-    return listar_pedidos_service(db)
-
-
-@router.get("/filtro")
-async def listar_por_canal(canal_pedido: CanalPedido, db: Session = Depends(get_db)):
-    return listar_por_canal_service(db, canal_pedido)
-
+def listar_pedidos(
+      canalPedido: Optional[CanalPedido] = Query(default=None),
+      db: Session = Depends(get_db)
+  ):
+      if canalPedido:
+          return listar_por_canal_service(db, canalPedido)
+      return listar_pedidos_service(db)
 
 
 @router.get("/{id}", response_model=PedidoResponse)
-async def listar_pedido(id: int, db: Session = Depends(get_db)):
+def listar_pedido(id: int, db: Session = Depends(get_db)):
     pedido = listar_pedido_por_id_service(db, id)
     if not pedido:
         raise HTTPException(status_code=404, detail="Pedido não encontrado")
@@ -45,15 +48,15 @@ async def listar_pedido(id: int, db: Session = Depends(get_db)):
 
 
 @router.delete("/{id}", status_code=204)
-async def deletar_pedido(id: int, db: Session = Depends(get_db)):
-    deletado = await deletar_pedido_service(db, id)
+def deletar_pedido(id: int, db: Session = Depends(get_db)):
+    deletado =  deletar_pedido_service(db, id)
     if not deletado:
         raise HTTPException(status_code=404, detail="Pedido não encontrado")
 
 
 @router.patch("/{id}", response_model=PedidoResponse)
-async def atualizar_pedido(id: int, pedido: PedidoUpdate, db: Session = Depends(get_db)):
-    pedido_atualizado = await atualizar_pedido_service(db, id, pedido)
+def atualizar_pedido(id: int, pedido: PedidoUpdate, db: Session = Depends(get_db)):
+    pedido_atualizado = atualizar_pedido_service(db, id, pedido)
     if not pedido_atualizado:
         raise HTTPException(status_code=404, detail="Pedido não encontrado")
     return pedido_atualizado
