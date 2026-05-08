@@ -1,5 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
+from api.database.models.estoque import Estoque
+from api.database.models.produto import Produto
 from api.database.models.unidade import Unidade
 
 
@@ -23,6 +25,26 @@ def listar_unidade_por_id_service(db: Session, id):
     if not unidade:
         raise HTTPException(status_code=404, detail="Unidade não encontrada")
     return unidade
+
+def listar_cardapio_por_unidade_service(db: Session,unidade_id: int,somente_disponiveis: bool = False):
+      unidade = db.query(Unidade).filter(Unidade.id == unidade_id).first()
+      if not unidade:
+          raise HTTPException(status_code=404, detail="Unidade não encontrada")
+      rows = (
+          db.query(Estoque, Produto).join(Produto, Produto.id == Estoque.produto_id)
+          .filter(Estoque.unidade_id == unidade_id).all())
+      cardapio = []
+      for estoque, produto in rows:
+          disponivel = estoque.quantidade > 0
+          if somente_disponiveis and not disponivel:
+              continue
+          cardapio.append({
+              "produto_id": produto.id,
+              "nome": produto.nome,
+              "preco": produto.preco,
+              "quantidade_estoque": estoque.quantidade,
+              "disponivel": disponivel})
+      return cardapio
 
 
 def deletar_unidade_service(db: Session, id):

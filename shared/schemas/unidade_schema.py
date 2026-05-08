@@ -16,3 +16,10 @@ class UnidadeResponse(UnidadeBase):
 
     class Config:
         from_attributes = True    
+
+class CardapioItem(BaseModel):
+    produto_id: int
+    nome: str
+    preco: float
+    quantidade_estoque: int
+    disponivel: bool

@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from api.database.conexao import get_db
-from shared.schemas.unidade_schema import UnidadeCreate, UnidadeResponse, UnidadeUpdate
+from shared.schemas.unidade_schema import CardapioItem, UnidadeCreate, UnidadeResponse, UnidadeUpdate
 from api.services.unidade_service import (
     atualizar_unidade_service,
     deletar_unidade_service,
+    listar_cardapio_por_unidade_service,
     listar_unidade_por_id_service,
     listar_unidades_service,
     criar_unidade_service
@@ -22,6 +23,11 @@ def criar_unidade(unidade: UnidadeCreate, db: Session = Depends(get_db)):
 @router.get("/", response_model=list[UnidadeResponse])
 def listar_unidades(db: Session = Depends(get_db)):
     return listar_unidades_service(db)
+
+
+@router.get("/{unidade_id}/cardapio", response_model=list[CardapioItem])
+def listar_cardapio(unidade_id: int, somente_disponiveis: bool = False, db: Session = Depends(get_db)):
+    return listar_cardapio_por_unidade_service(db, unidade_id, somente_disponiveis)
 
 
 @router.get("/{id}", response_model=UnidadeResponse)
