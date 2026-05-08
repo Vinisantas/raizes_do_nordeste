@@ -33,7 +33,7 @@ Mapeamento da organizacao atual para as camadas da rubrica:
   - `api/services/*`
   - Orquestracao dos fluxos: criar pedido, validar estoque, mock de pagamento, atualizacao de status.
 
-- Infrastructure (persistencia e integracoes):
+- Infrastructure (persistencia de dados e integracoes):
   - `api/database/conexao.py`
   - `api/database/models/*`
   - `payment/mock_pagamento/*`
@@ -109,7 +109,7 @@ Arquivo de referencia:
 - `PATCH /pedidos/{id}/status`
 
 ## 10. Fluxo critico entregue (pedido -> pagamento mock -> status)
-1. Criar usuario (`POST /usuarios/`)
+1. Criar usuario ADMIN (`POST /usuarios/`)
 2. Autenticar (`POST /auth/token`)
 3. Criar unidade (`POST /unidades/`)
 4. Criar produto (`POST /produtos/`)
@@ -187,13 +187,5 @@ Preencher/confirmar antes da entrega final:
 7. `GET /pedidos/?canalPedido=APP` -> filtra por canal
 8. `GET /unidades/{id}/cardapio?somente_disponiveis=true` -> apenas itens vendaveis
 
-## 17. Troubleshooting
-- Erro `database "admin" does not exist`:
-  - corrigido no `healthcheck` com `pg_isready -U admin -d raizes_do_nordeste`.
-
-- Rota de cardapio retornando 404:
-  - rota correta: `/unidades/{id}/cardapio`
-  - rota incorreta: `/unidades/cardapio/{id}`
-
-## 18. Autor
+## 17. Autor
 - Projeto academico da disciplina de Projeto Multidisciplinar - Trilha Back-end (2026).
