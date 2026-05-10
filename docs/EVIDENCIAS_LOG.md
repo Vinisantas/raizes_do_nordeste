@@ -99,3 +99,19 @@ cat logs/auditoria.log
 
 # Filtrar por erro
 grep ERROR logs/auditoria.log
+
+Segue sequencia de logs registrados pelo logger:
+
+2026-05-10 18:16:49 - api.controllers.autenticacao_controller - INFO - Login bem-sucedido - Usuário: teste@example.com - Role: ADMIN
+
+2026-05-10 18:16:55 - api.services.pedido_service - INFO - Criando pedido - Cliente: teste (ID: 1) - Canal: APP
+
+2026-05-10 18:16:55 - api.services.pedido_service - INFO - Pedido 4 criado - Total: R$51.80 - Cliente: teste
+
+2026-05-10 18:16:57 - api.services.pedido_service - ERROR - Erro ao criar pedido: 400: Estoque insuficiente
+
+2026-05-10 18:17:02 - api.services.pedido_service - INFO - Criando pedido - Cliente: teste (ID: 1) - Canal: APP
+
+2026-05-10 18:17:02 - api.services.pedido_service - ERROR - Pedido Cancelado - pagamento recusado
+
+2026-05-10 18:17:02 - api.services.pedido_service - WARNING - Estoque estornado para pedido 6
