@@ -2,7 +2,9 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from api.database.models.estoque import Estoque
 from shared.schemas.estoque_schema import EstoqueConsulta, EstoqueCreate
+from api.utils.logger import setup_logger
 
+logger = setup_logger(__name__)
 
 def buscar_estoque_por_produto(db: Session ,produto_id: int, unidade_id:int ):
     busca = db.query(Estoque).filter(
@@ -23,6 +25,7 @@ def criar_estoque_service(db: Session, estoque: EstoqueCreate):
         unidade_id=estoque.unidade_id,
         quantidade=estoque.quantidade
     )
+    logger.info(f"Estoque para a Unidade {Unidade.id} criado!")
     db.add(novo_estoque)
     db.commit()
     db.refresh(novo_estoque)

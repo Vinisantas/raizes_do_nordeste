@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session, selectinload
 from api.database.models.pedido import ItemPedido, Pedido
 from api.database.models.produto import Produto
 from api.database.models.pagamento import Pagamento as PagamentoModel
+from api.database.models.usuario import Usuario
 
 from api.services.pagamento_service import processar_pagamento
 from api.services.estoque_service import entrada_estoque_service, saida_estoque_service
@@ -13,11 +14,18 @@ from shared.enums.pagamento_enum import StatusPagamento
 from shared.enums.pedido_enum import TRANSICOES, CanalPedido, StatusPedido
 from shared.schemas.estoque_schema import EstoqueConsulta
 from shared.schemas.pedido_schema import PedidoCreate, PedidoUpdate
+from api.utils.logger import setup_logger
+
+logger = setup_logger(__name__)
 
 
 async def criar_pedido_service(db: Session, pedido: PedidoCreate):
 
     try:
+        usuario = db.query(Usuario).filter(Usuario.id == pedido.usuario_id).first()
+        if not usuario:
+            logger.error(f"Usuário {pedido.usuario_id} não encontrado")
+            raise HTTPException(404, "Usuário não encontrado")
         total = 0
         itens_processados = []
         db_pedido = Pedido(
@@ -61,18 +69,21 @@ async def criar_pedido_service(db: Session, pedido: PedidoCreate):
             transacao_id=resultado_pagamento.get("transacao_id"),
             resposta_gateway=resultado_pagamento
         )
+        logger.info(f"Criando pedido - Cliente: {usuario.nome} (ID: {usuario.id}) - Canal: {pedido.canal_pedido.value}")
         if resultado_pagamento["status"] == "success":
             db_pedido.status = StatusPedido.COZINHA
             novo_pagamento.status = StatusPagamento.SUCCESS
             novo_pagamento.data_pagamento = datetime.utcnow()
-            print(f"Pagamento aprovado para pedido {db_pedido.id}")
+            logger.info(f"Pedido {db_pedido.id} criado - Total: R${total:.2f} - Cliente: {usuario.nome}")
+
         elif resultado_pagamento["status"] == "pending":
             db_pedido.status = StatusPedido.AGUARDANDO_PAGAMENTO
             novo_pagamento.status = StatusPagamento.PENDING
-            print(f"Pagamento pendente para pedido {db_pedido.id}")
+            logger.error(f"Pagamento pendente para pedido {db_pedido.id}")
         else:
             db_pedido.status = StatusPedido.CANCELADO
             novo_pagamento.status = StatusPagamento.ERROR
+            logger.error(f"Pedido Cancelado - pagamento recusado")
             for item in itens_processados:
                 entrada_estoque_service(
                     db,
@@ -80,15 +91,14 @@ async def criar_pedido_service(db: Session, pedido: PedidoCreate):
                         produto_id=item["produto_id"],
                         unidade_id=pedido.unidade_id,
                         quantidade=item["quantidade"]))
-            print(f"Pagamento recusado para pedido {db_pedido.id}")
+            logger.warning(f"Estoque estornado para pedido {db_pedido.id}")
         db.add(novo_pagamento)
         db.commit()
         db.refresh(db_pedido)
-        print(f"Pedido {db_pedido.id} criado com sucesso")
         return db_pedido
     except Exception as e:
         db.rollback()
-        print(f"Erro ao criar pedido: {str(e)}")
+        logger.error(f"Erro ao criar pedido: {str(e)}")
         raise e
 
 def listar_pedidos_service(db: Session):
@@ -141,6 +151,7 @@ def atualizar_status_service(
          db: Session,
          current_user):
     pedido = listar_pedido_por_id_service(db, id)
+    usuario = db.query(Usuario).filter(Usuario.id == pedido.usuario_id).first()
     if not pedido:
         raise HTTPException(status_code=404, detail="Pedido não encontrado")
     proximos_possiveis = TRANSICOES.get(pedido.status, [])
@@ -150,6 +161,7 @@ def atualizar_status_service(
             status_code=400,
             detail=f"Transição inválida: Não é possível mudar de {pedido.status} para {novo_status}")
     pedido.status = novo_status
+    logger.info(f"Status do pedido atualizado para : {novo_status.value} pelo Usuário: {usuario.nome}")
     db.commit()
     db.refresh(pedido)
     return pedido

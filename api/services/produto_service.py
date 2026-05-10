@@ -2,7 +2,9 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from api.database.models.produto import Produto
 from shared.schemas.produto_schema import  ProdutoCreate, ProdutoUpdate
+from api.utils.logger import setup_logger
 
+logger = setup_logger(__name__)
 
 def criar_produto_service(db: Session, produto: ProdutoCreate, current_user):
     db_produto = Produto(
@@ -12,6 +14,7 @@ def criar_produto_service(db: Session, produto: ProdutoCreate, current_user):
     db.add(db_produto)
     db.commit()
     db.refresh(db_produto)
+    logger.info(f"Produto {produto.nome} criado!")
     return db_produto
 
 

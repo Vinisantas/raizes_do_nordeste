@@ -19,6 +19,8 @@ services:
 
     volumes:
       - ./shared:/app/shared
+      - ./logs:/app/logs  # Mapeia pasta local para dentro do container
+
 
     networks:
       - app-network

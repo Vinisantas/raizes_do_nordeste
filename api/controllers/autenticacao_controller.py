@@ -8,10 +8,12 @@ from api.database.models.usuario import Usuario
 from api.authentication.security import require_role, verificar_senha
 from shared.schemas.token_schema import Token
 from api.services.token_service import cria_token_acesso
+from api.utils.logger import setup_logger
+
 
 
 router = APIRouter(prefix="/auth", tags=["auth"])
-
+logger = setup_logger(__name__)
 
 @router.post('/token')
 async def authenticate_user(
@@ -25,6 +27,7 @@ async def authenticate_user(
         raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,detail="Email ou senha inválidos")
     access_token = cria_token_acesso(
         data={"sub": cliente.email})
+    logger.info(f"Login bem-sucedido - Usuário: {cliente.email} - Role: {cliente.role.value}")
     return Token(access_token=access_token, token_type="bearer")
 
 

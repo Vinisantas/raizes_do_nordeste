@@ -13,6 +13,7 @@ from shared.schemas.error_schema import erro_padrao
 from fastapi.middleware.cors import CORSMiddleware
 
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print(" Iniciando aplicação...")

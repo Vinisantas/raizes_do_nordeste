@@ -168,7 +168,7 @@ Preencher/confirmar antes da entrega final:
 - [x] Campo `canal_pedido` no fluxo de pedido
 - [x] Filtro por canal no endpoint de pedidos
 - [x] Fluxo de pagamento mock integrado
-- [ ] Contrato de erro padronizado conforme template do PDF (`error`, `message`, `details`, `timestamp`, `path`)
+- [x] Contrato de erro padronizado conforme template do PDF (`error`, `message`, `details`, `timestamp`, `path`)
 - [ ] Colecao Postman/Insomnia (`.json`) no repositorio
 - [ ] Plano de testes com 10 cenarios (6 positivos + 4 negativos)
 - [ ] DER (imagem/PDF) no repositorio
