@@ -1,134 +1,179 @@
-﻿# Raizes do Nordeste - Projeto Back-end
+﻿# Raizes do Nordeste - Back-end API
 
-![Status](https://img.shields.io/badge/STATUS-EM_DESENVOLVIMENTO-10B981?style=flat-square)
-![Python](https://img.shields.io/badge/Python-3.12-0F172A?style=flat-square&logo=python)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-0F172A?style=flat-square&logo=fastapi)
+API REST para uma rede de lanchonetes regional, desenvolvida como atividade pratica da trilha Back-end (2026).
 
-## 1. Objetivo do projeto
-API REST para uma rede de lanchonetes com:
-- cadastro e autenticacao de usuarios
-- gestao de unidades, produtos e estoque
-- criacao de pedidos com multicanalidade (`canal_pedido`)
-- simulacao de pagamento externo (mock)
-- atualizacao de status do pedido
+---
 
-Este repositorio atende o cenario da atividade pratica da trilha Back-end (2026).
+## Indice
 
-## 2. Tecnologias
+- Tecnologias
+- Arquitetura
+- Pre-requisitos
+- Instalacao e Execucao
+- Variaveis de Ambiente
+- Endpoints Principais
+- Multicanalidade
+- Fluxo de Pedido
+- Exemplo de Criacao de Pedido
+- Testes
+- Documentacao Adicional
+- Seguranca e LGPD
+- Entregaveis
+- Autor
+
+---
+
+## Tecnologias
+
 - Python 3.12
 - FastAPI
 - SQLAlchemy
 - PostgreSQL
 - Docker / Docker Compose
+- JWT para autenticacao
 
-## 3. Arquitetura (camadas equivalentes)
-Mapeamento da organizacao atual para as camadas da rubrica:
+---
 
-- API (interface/controllers):
-  - `api/main.py`
-  - `api/controllers/*`
-  - Responsavel por rotas, contratos HTTP, autenticacao/autorizacao na borda.
+## Arquitetura (Camadas)
 
-- Application (casos de uso/servicos):
-  - `api/services/*`
-  - Orquestracao dos fluxos: criar pedido, validar estoque, mock de pagamento, atualizacao de status.
+O projeto segue separacao clara de responsabilidades:
 
-- Infrastructure (persistencia de dados e integracoes):
-  - `api/database/conexao.py`
-  - `api/database/models/*`
-  - `payment/mock_pagamento/*`
-  - ORM, banco de dados e integracao externa simulada.
+- API (Controllers): api/controllers/ - Rotas HTTP, autenticacao
+- Application (Services): api/services/ - Casos de uso, orquestracao
+- Infrastructure: api/database/, payment/ - Persistencia, integracoes
+- Domain: shared/enums/ - Regras de negocio, enums
 
-- Domain (regras de dominio):
-  - `shared/enums/*`
-  - regras de status, canal de pedido e metodos/status de pagamento.
+---
 
-## 4. Requisitos para executar
+## Pre-requisitos
+
 - Docker instalado
 - Docker Compose instalado
-- Porta `8000` livre (API)
-- Porta `8001` livre (mock pagamento)
-- Porta `5433` livre (PostgreSQL)
+- Portas livres: 8000 (API), 8001 (Mock), 5433 (PostgreSQL)
 
-## 5. Configuracao de ambiente
-1. Crie o arquivo `.env` na raiz (copie de `.env.example`).
-2. Preencha as variaveis obrigatorias:
+---
 
-```env
-SECRET_KEY=coloque_uma_chave_forte_aqui
+## Instalacao e Execucao
+
+**1. Clone o repositorio**
+
+git clone https://github.com/Vinisantas/raizes_do_nordeste.git
+cd raizes_do_nordeste
+
+**2. Configure as variaveis de ambiente**
+
+cp .env.example .env
+
+Edite o arquivo .env:
+
+SECRET_KEY=sua_chave_secreta_forte_aqui
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=60
-```
 
-Observacao:
-- O banco do container PostgreSQL ja e configurado no `docker-compose.yml` como:
-  - usuario: `admin`
-  - senha: `admin`
-  - banco: `raizes_do_nordeste`
+**3. Execute com Docker**
 
-## 6. Como executar
-Na raiz do projeto:
-
-```bash
 docker compose up --build
-```
 
-Para encerrar:
+**4. Acesse os servicos**
 
-```bash
+- API Swagger: http://localhost:8000/docs
+- OpenAPI JSON: http://localhost:8000/openapi.json
+- Mock Pagamento: http://localhost:8001/docs
+
+**5. Parar os containers**
+
 docker compose down
-```
 
-## 7. Banco de dados e inicializacao
-Atualmente o projeto inicializa tabelas com SQLAlchemy via `Base.metadata.create_all(...)` no startup da API.
+---
 
-Arquivo de referencia:
-- `api/database/conexao.py`
+## Variaveis de Ambiente
 
-## 8. URLs importantes
-- API: `http://localhost:8000`
-- Swagger: `http://localhost:8000/docs`
-- OpenAPI JSON: `http://localhost:8000/openapi.json`
-- Mock de pagamento: `http://localhost:8001/docs`
+- SECRET_KEY: Chave secreta para assinar tokens JWT
+- ALGORITHM: Algoritmo de assinatura (HS256)
+- ACCESS_TOKEN_EXPIRE_MINUTES: Tempo de expiracao do token
 
-## 9. Endpoints principais
-- `POST /auth/token`
-- `GET /auth/admin-area`
-- `POST /usuarios/`
-- `GET /usuarios/`
-- `GET /usuarios/me`
-- `POST /unidades/`
-- `GET /unidades/`
-- `GET /unidades/{unidade_id}/cardapio?somente_disponiveis=true|false`
-- `POST /produtos/`
-- `GET /produtos/`
-- `POST /estoques/`
-- `GET /estoques/{unidade_id}`
-- `POST /pedidos/`
-- `GET /pedidos/?canalPedido=APP|TOTEM|BALCAO|PICKUP|WEB`
-- `PATCH /pedidos/{id}/status`
+---
 
-## 10. Fluxo critico entregue (pedido -> pagamento mock -> status)
-1. Criar usuario ADMIN (`POST /usuarios/`)
-2. Autenticar (`POST /auth/token`)
-3. Criar unidade (`POST /unidades/`)
-4. Criar produto (`POST /produtos/`)
-5. Criar estoque (`POST /estoques/`)
-6. Criar pedido (`POST /pedidos/`) com:
-   - `canal_pedido`
-   - `forma_pagamento`
-   - `simulacao_pagamento` (`success`, `error`, `pending`)
-7. Verificar resultado:
-   - `success` -> pedido segue para cozinha
-   - `pending` -> pedido fica aguardando pagamento
-   - `error` -> pedido cancelado e estoque estornado
+## Endpoints Principais
 
-## 11. Exemplo de criacao de pedido
-```json
+**Autenticacao**
+
+- POST /auth/token - Login (obter token)
+- GET /auth/admin-area - Area administrativa
+
+**Usuarios**
+
+- POST /usuarios/ - Cadastrar usuario
+- GET /usuarios/ - Listar usuarios (ADMIN)
+- GET /usuarios/me - Perfil do usuario logado
+
+**Unidades**
+
+- POST /unidades/ - Criar unidade (ADMIN)
+- GET /unidades/ - Listar unidades
+- GET /unidades/{id}/cardapio - Cardapio por unidade
+
+**Produtos**
+
+- POST /produtos/ - Criar produto (ADMIN)
+- GET /produtos/ - Listar produtos
+
+**Estoque**
+
+- POST /estoques/ - Definir estoque (ADMIN)
+- GET /estoques/{unidade_id} - Consultar estoque
+
+**Pedidos**
+
+- POST /pedidos/ - Criar pedido (JWT)
+- GET /pedidos/ - Listar pedidos com filtros
+- PATCH /pedidos/{id}/status - Atualizar status
+
+---
+
+## Multicanalidade
+
+Valores aceitos para canalPedido:
+
+- APP - Aplicativo mobile
+- TOTEM - Totem de autoatendimento
+- BALCAO - Atendimento direto no balcao
+- PICKUP - Retirada no local
+- WEB - Site/Web
+
+Consultar pedidos por canal:
+
+GET /pedidos/?canalPedido=APP
+
+---
+
+## Fluxo de Pedido
+
+O fluxo principal do sistema:
+
+1. Criar usuario ADMIN (POST /usuarios/)
+2. Autenticar (POST /auth/token)
+3. Criar unidade (POST /unidades/)
+4. Criar produto (POST /produtos/)
+5. Criar estoque (POST /estoques/)
+6. Criar pedido com simulacao de pagamento (POST /pedidos/)
+
+**Simulacao de Pagamento (mock)**
+
+- success: Pedido aprovado, segue para cozinha
+- pending: Pedido aguardando confirmacao
+- error: Pedido cancelado + estoque estornado
+
+---
+
+## Exemplo de Criacao de Pedido
+
+POST /pedidos/
+
 {
   "usuario_id": 1,
   "unidade_id": 1,
-  "canal_pedido": "TOTEM",
+  "canal_pedido": "APP",
   "forma_pagamento": "PIX",
   "simulacao_pagamento": "success",
   "itens": [
@@ -138,54 +183,94 @@ Arquivo de referencia:
     }
   ]
 }
-```
 
-## 12. Multicanalidade (requisito da atividade)
-- Campo obrigatorio no pedido: `canal_pedido`
-- Valores aceitos: `APP`, `TOTEM`, `BALCAO`, `PICKUP`, `WEB`
-- Consulta por canal:
-  - `GET /pedidos/?canalPedido=TOTEM`
+---
 
-## 13. Controle de estoque por unidade e cardapio
-- Estoque por unidade:
-  - `POST /estoques/`
-  - `GET /estoques/{unidade_id}`
-- Cardapio por unidade:
-  - `GET /unidades/{unidade_id}/cardapio`
-  - `GET /unidades/{unidade_id}/cardapio?somente_disponiveis=true`
+## Testes
 
-## 14. Seguranca
-- Autenticacao via token bearer (`/auth/token`)
-- Hash de senha no cadastro de usuario
-- Regra de autorizacao por perfil em endpoints protegidos (`require_role`)
+**Colecao Postman**
 
-## 15. Entregaveis da atividade (checklist)
-Preencher/confirmar antes da entrega final:
+Arquivo: Raizes_do_nordeste.postman_collection.json
+
+**Cenarios de Teste (10 no total)**
+
+Positivos (6):
+- CT-01: Criar usuario ADMIN - 201 Created
+- CT-02: Login valido - 200 OK + Token
+- CT-03: Criar unidade - 201 Created
+- CT-04: Criar produto - 201 Created
+- CT-05: Criar estoque - 201 Created
+- CT-06: Criar pedido com pagamento success - 201 Created
+
+Negativos (4):
+- CT-07: Pedido sem estoque - 400 Bad Request
+- CT-08: Login com senha errada - 401 Unauthorized
+- CT-09: Acesso sem token - 401 Unauthorized
+- CT-10: Pedido com pagamento error - Cancelado + Estorno
+
+---
+
+## Documentacao Adicional
+
+- docs/LGPD.pdf - Documento LGPD
+- docs/PLANO_TESTES.md - Plano de testes detalhado
+- docs/EVIDENCIAS_LOG.md - Evidencias de logs
+- docs/DER.png - Diagrama Entidade-Relacionamento
+- docs/diagrama_casos_uso.png - Diagrama de Casos de Uso
+- docs/diagrama_classes.png - Diagrama de Classes
+
+---
+
+## Seguranca e LGPD
+
+**Controles implementados**
+
+- Autenticacao JWT com tokens de acesso
+- Autorizacao por perfis (ADMIN, CLIENTE, GERENTE)
+- Hash de senhas (bcrypt/werkzeug)
+- Protecao de rotas com require_role
+- Logs de auditoria para acoes sensiveis
+- Documento LGPD com finalidade, minimizacao, consentimento e retencao
+
+**Acoes sensiveis com logging**
+
+- Login: INFO - Usuario, role, timestamp
+- Criacao de pedido: INFO - Cliente, canal, valor
+- Cancelamento de pedido: ERROR - Pedido, motivo, estorno
+- Pagamento recusado: ERROR - Pedido, status
+
+---
+
+## Entregaveis
 
 - [x] Codigo-fonte no repositorio
-- [x] API executando localmente com Docker
+- [x] API executando com Docker
 - [x] Swagger disponivel
-- [x] Campo `canal_pedido` no fluxo de pedido
-- [x] Filtro por canal no endpoint de pedidos
-- [x] Fluxo de pagamento mock integrado
-- [x] Contrato de erro padronizado conforme template do PDF (`error`, `message`, `details`, `timestamp`, `path`)
-- [ ] Colecao Postman/Insomnia (`.json`) no repositorio
-- [ ] Plano de testes com 10 cenarios (6 positivos + 4 negativos)
-- [ ] DER (imagem/PDF) no repositorio
-- [ ] Diagrama de casos de uso
-- [ ] Diagrama de classes (sequencia/atividade recomendado)
-- [ ] Documento LGPD (finalidade, minimizacao, consentimento, retencao)
-- [ ] Evidencia de logs/auditoria de acoes sensiveis
+- [x] Campo canal_pedido no fluxo
+- [x] Filtro por canal
+- [x] Mock de pagamento
+- [x] Contrato de erro padronizado
+- [x] Colecao Postman (.json)
+- [x] Plano de testes (10 cenarios)
+- [x] DER (diagrama)
+- [x] Diagrama de Casos de Uso
+- [x] Diagrama de Classes
+- [x] Diagrama de Sequencia
+- [x] Documento LGPD
+- [x] Evidencia de logs/auditoria
 
-## 16. Testes manuais recomendados
-1. `POST /auth/token` com credenciais validas -> `200`
-2. Acesso sem token em rota protegida -> `401`
-3. Acesso com perfil sem permissao -> `403`
-4. `POST /pedidos/` com item invalido -> erro de validacao
-5. `POST /pedidos/` com estoque insuficiente -> erro de regra de negocio
-6. `POST /pedidos/` com `simulacao_pagamento=error` -> pedido cancelado
-7. `GET /pedidos/?canalPedido=APP` -> filtra por canal
-8. `GET /unidades/{id}/cardapio?somente_disponiveis=true` -> apenas itens vendaveis
+---
 
-## 17. Autor
-- Projeto academico da disciplina de Projeto Multidisciplinar - Trilha Back-end (2026).
+## Autor
+
+**Vinícius Santana**
+
+Projeto Multidisciplinar - Trilha Back-end (2026)
+
+---
+
+## Links Uteis
+
+- Repositorio: https://github.com/Vinisantas/raizes_do_nordeste
+- Swagger API: http://localhost:8000/docs
+- Mock Pagamento: http://localhost:8001/docs
