@@ -20,7 +20,7 @@ def criar_usuario_service(db: Session, usuario: UsuarioCreate):
         raise ValueError(f"Erro: O email {usuario.email} já está cadastrado.")
 
 
-def listar_usuarios_service(db: Session):
+def listar_usuarios_service(db: Session, current_user):
     return db.query(Usuario).all()
 
 

@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from api.authentication.security import get_current_user
+from api.authentication.security import get_current_user, require_role
 from api.database.conexao import get_db
+from api.database.models.usuario import Usuario
 from shared.schemas.response_schema import ApiResponse
 from shared.schemas.usuario_schema import UsuarioCreate, UsuarioResponse, UsuarioUpdate
 from api.services.usuario_service import (
@@ -27,8 +28,9 @@ def criar_usuario(usuario: UsuarioCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=ApiResponse)
-def listar_usuarios(db: Session = Depends(get_db)):
-    usuarios = listar_usuarios_service(db)
+def listar_usuarios(db: Session = Depends(get_db),
+                    current_user: Usuario = Depends(require_role("ADMIN", "GERENTE"))):
+    usuarios = listar_usuarios_service(db, current_user)
     return ApiResponse(
         success=True,
         data=[UsuarioResponse.model_validate(u) for u in usuarios],

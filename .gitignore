@@ -1,3 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+.vscode/
+.idea/
+
+
 # Logs
 logs/
 *.log

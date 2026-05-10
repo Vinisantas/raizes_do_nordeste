@@ -1,0 +1,390 @@
+{
+  "info": {
+    "_postman_id": "73fe0acb-8d8c-4edd-88f2-0b7218fcdb4b",
+    "name": "Raizes_do_nordeste",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "39514491",
+    "_collection_link": "https://go.postman.co/collection/39514491-73fe0acb-8d8c-4edd-88f2-0b7218fcdb4b?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "/usuarios/",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{url}}//usuarios/",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "",
+            "usuarios",
+            ""
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Default",
+          "originalRequest": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{url}}//usuarios/",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "",
+                "usuarios",
+                ""
+              ]
+            }
+          },
+          "status": "Created",
+          "code": 201,
+          "_postman_previewlanguage": null,
+          "header": null,
+          "cookie": [],
+          "body": "json"
+        }
+      ]
+    },
+    {
+      "name": "/usuarios/",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{url}}//usuarios/",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "",
+            "usuarios",
+            ""
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Default",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{url}}//usuarios/",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "",
+                "usuarios",
+                ""
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": null,
+          "header": null,
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "/auth/token",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{url}}//auth/token",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "",
+            "auth",
+            "token"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Default",
+          "originalRequest": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{url}}//auth/token",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "",
+                "auth",
+                "token"
+              ]
+            }
+          },
+          "status": "Created",
+          "code": 201,
+          "_postman_previewlanguage": null,
+          "header": null,
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "/unidades/",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{url}}//unidades/",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "",
+            "unidades",
+            ""
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Default",
+          "originalRequest": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{url}}//unidades/",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "",
+                "unidades",
+                ""
+              ]
+            }
+          },
+          "status": "Created",
+          "code": 201,
+          "_postman_previewlanguage": null,
+          "header": null,
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "/produtos/",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{url}}//produtos/",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "",
+            "produtos",
+            ""
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Default",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{url}}//produtos/",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "",
+                "produtos",
+                ""
+              ]
+            }
+          },
+          "status": "Created",
+          "code": 201,
+          "_postman_previewlanguage": null,
+          "header": null,
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "/estoques/",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{url}}//estoques/",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "",
+            "estoques",
+            ""
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Default",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{url}}//estoques/",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "",
+                "estoques",
+                ""
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": null,
+          "header": null,
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    },
+    {
+      "name": "/pedidos/",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{url}}//pedidos/",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "",
+            "pedidos",
+            ""
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Default",
+          "originalRequest": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{url}}//pedidos/",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "",
+                "pedidos",
+                ""
+              ]
+            }
+          },
+          "status": "Created",
+          "code": 201,
+          "_postman_previewlanguage": null,
+          "header": null,
+          "cookie": [],
+          "body": ""
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "url",
+      "value": "https://d342830f-3bf3-4e7a-8e1a-c7218741950b.mock.pstmn.io"
+    }
+  ]
+}

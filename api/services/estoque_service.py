@@ -1,6 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from api.database.models.estoque import Estoque
+from api.database.models.unidade import Unidade
 from shared.schemas.estoque_schema import EstoqueConsulta, EstoqueCreate
 from api.utils.logger import setup_logger
 
@@ -25,7 +26,8 @@ def criar_estoque_service(db: Session, estoque: EstoqueCreate):
         unidade_id=estoque.unidade_id,
         quantidade=estoque.quantidade
     )
-    logger.info(f"Estoque para a Unidade {Unidade.id} criado!")
+    unidade = db.query(Unidade).filter(Unidade.id == estoque.unidade_id).first()
+    logger.info(f"Estoque para a Unidade {unidade.nome} criado!")
     db.add(novo_estoque)
     db.commit()
     db.refresh(novo_estoque)
