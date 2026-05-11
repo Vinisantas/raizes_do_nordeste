@@ -24,7 +24,11 @@ router = APIRouter(prefix="/pedidos", tags=["Pedidos"])
 
 
 @router.post("/", response_model=PedidoResponse, status_code=201)
-async def criar_pedido(pedido: PedidoCreate, db: Session = Depends(get_db)):
+async def criar_pedido(
+    pedido: PedidoCreate,
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(require_role("ADMIN", "GERENTE", "CLIENTE"))
+):
     return await criar_pedido_service(db, pedido)
 
 
@@ -55,7 +59,12 @@ def deletar_pedido(id: int, db: Session = Depends(get_db)):
 
 
 @router.patch("/{id}", response_model=PedidoResponse)
-def atualizar_pedido(id: int, pedido: PedidoUpdate, db: Session = Depends(get_db)):
+def atualizar_pedido(
+    id: int,
+    pedido: PedidoUpdate,
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(require_role("ADMIN", "GERENTE"))
+):
     pedido_atualizado = atualizar_pedido_service(db, id, pedido)
     if not pedido_atualizado:
         raise HTTPException(status_code=404, detail="Pedido não encontrado")

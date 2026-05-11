@@ -19,6 +19,7 @@ def criar_estoque_service(db: Session, estoque: EstoqueCreate):
     estoque_existente = buscar_estoque_por_produto(db, estoque.produto_id, estoque.unidade_id)
     if estoque_existente:
         estoque_existente.quantidade += estoque.quantidade
+        db.commit()
         db.refresh(estoque_existente)
         return estoque_existente
     novo_estoque = Estoque(

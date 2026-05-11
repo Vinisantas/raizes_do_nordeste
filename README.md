@@ -227,7 +227,7 @@ Negativos (4):
 
 - Autenticacao JWT com tokens de acesso
 - Autorizacao por perfis (ADMIN, CLIENTE, GERENTE)
-- Hash de senhas (bcrypt/werkzeug)
+- Hash de senhas com `pwdlib[argon2]`
 - Protecao de rotas com require_role
 - Logs de auditoria para acoes sensiveis
 - Documento LGPD com finalidade, minimizacao, consentimento e retencao

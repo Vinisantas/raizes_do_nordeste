@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-
+from api.authentication.security import require_role
+from api.database.models.usuario import Usuario
 from api.database.conexao import get_db
 from shared.schemas.estoque_schema import EstoqueCreate, EstoqueResponse
 from api.services.estoque_service import criar_estoque_service, listar_estoque_por_unidade
@@ -9,7 +10,11 @@ from api.services.estoque_service import criar_estoque_service, listar_estoque_p
 router = APIRouter(prefix="/estoques", tags=["Estoques"])
 
 @router.post("/" , response_model=EstoqueResponse, status_code=201)
-def criar_estoque(estoque: EstoqueCreate, db: Session = Depends(get_db)):
+def criar_estoque(
+    estoque: EstoqueCreate,
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(require_role("ADMIN", "GERENTE"))
+):
     return criar_estoque_service(db, estoque)
 
 @router.get("/{unidade_id}", response_model=list[EstoqueResponse])
