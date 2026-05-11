@@ -4,12 +4,15 @@ from pydantic import BaseModel, field_validator
 from api.database.models.pedido import StatusPedido, CanalPedido
 from shared.enums.pagamento_enum import MetodoPagamento
 
-
 class ItemPedidoCreate(BaseModel):
     produto_id: int
     quantidade: int
-
-
+    @field_validator("quantidade")
+    def validar_quantidade(cls, v):
+        if v <= 0:
+            raise ValueError("Quantidade deve ser maior que zero")
+        return v
+    
 class PedidoCreate(BaseModel):
     usuario_id: int
     unidade_id: int
@@ -36,11 +39,4 @@ class PedidoResponse(BaseModel):
     class Config:
         from_attributes = True
 
-class ItemPedidoCreate(BaseModel):
-    produto_id: int
-    quantidade: int
-    @field_validator("quantidade")
-    def validar_quantidade(cls, v):
-        if v <= 0:
-            raise ValueError("Quantidade deve ser maior que zero")
-        return v
+
