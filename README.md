@@ -212,7 +212,7 @@ Negativos (4):
 
 ## Documentacao Adicional
 
-- docs/LGPD.pdf - Documento LGPD
+- docs/LGPD.md - Documento LGPD
 - docs/PLANO_TESTES.md - Plano de testes detalhado
 - docs/EVIDENCIAS_LOG.md - Evidencias de logs
 - docs/DER.png - Diagrama Entidade-Relacionamento
